@@ -6,7 +6,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button, Card, Badge } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
-import { formatPrice } from "@/lib/utils";
+import { formatProductPrice } from "@/lib/utils";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
@@ -51,6 +51,7 @@ export default function AdminProductsPage() {
             <thead>
               <tr className="border-b border-slate-100 text-left text-slate-500">
                 <th className="px-6 py-3 font-medium">Name</th>
+                <th className="px-6 py-3 font-medium">Model</th>
                 <th className="px-6 py-3 font-medium">Category</th>
                 <th className="px-6 py-3 font-medium">Price</th>
                 <th className="px-6 py-3 font-medium">Stock</th>
@@ -65,8 +66,9 @@ export default function AdminProductsPage() {
                     <p className="font-medium">{p.name}</p>
                     <p className="text-xs text-slate-400">{p.sku}</p>
                   </td>
+                  <td className="px-6 py-3 text-slate-500">{p.model || "—"}</td>
                   <td className="px-6 py-3 text-slate-500">{p.categories?.name || "—"}</td>
-                  <td className="px-6 py-3">{formatPrice(p.discount_price ?? p.base_price)}</td>
+                  <td className="px-6 py-3">{formatProductPrice(p)}</td>
                   <td className="px-6 py-3">{p.stock_quantity}</td>
                   <td className="px-6 py-3">
                     <button onClick={() => toggleActive(p)}>

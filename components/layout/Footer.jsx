@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Phone, MapPin, Share2 } from "lucide-react";
+import { Phone, MapPin, Share2, Mail } from "lucide-react";
 import Logo from "@/components/layout/Logo";
 import { BUSINESS } from "@/lib/utils";
 
@@ -39,11 +39,11 @@ export default function Footer() {
             <h3 className="font-display font-semibold text-white mb-4">Categories</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/categories" className="hover:text-sky-400 transition-colors">All Categories</Link></li>
-              <li><Link href="/products?category=door-mosquito-nets" className="hover:text-sky-400 transition-colors">Door Nets</Link></li>
-              <li><Link href="/products?category=window-mosquito-nets" className="hover:text-sky-400 transition-colors">Window Nets</Link></li>
-              <li><Link href="/products?category=pleated-retractable-systems" className="hover:text-sky-400 transition-colors">Pleated Systems</Link></li>
-              <li><Link href="/products?category=magnetic-mesh-screens" className="hover:text-sky-400 transition-colors">Magnetic Mesh</Link></li>
-              <li><Link href="/products?category=mosquito-net-installation" className="hover:text-sky-400 transition-colors">Installation</Link></li>
+              <li><Link href="/products?category=window-openable" className="hover:text-sky-400 transition-colors">Window Openable</Link></li>
+              <li><Link href="/products?category=door-openable" className="hover:text-sky-400 transition-colors">Door Openable</Link></li>
+              <li><Link href="/products?category=pleated-system" className="hover:text-sky-400 transition-colors">Pleated System</Link></li>
+              <li><Link href="/products?category=velcro-system" className="hover:text-sky-400 transition-colors">Velcro System</Link></li>
+              <li><Link href="/products?category=sliding-system" className="hover:text-sky-400 transition-colors">Sliding System</Link></li>
             </ul>
           </div>
 
@@ -58,6 +58,12 @@ export default function Footer() {
                 <a href={`tel:${BUSINESS.phoneRaw}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
                   <Phone className="h-4 w-4 text-sky-400" />
                   {BUSINESS.phone}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
+                  <Mail className="h-4 w-4 text-sky-400" />
+                  {BUSINESS.email}
                 </a>
               </li>
               <li>

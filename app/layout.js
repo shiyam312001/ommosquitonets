@@ -2,6 +2,7 @@ import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import { CartHydration } from "@/components/CartHydration";
 import { AuthProvider } from "@/context/AuthProvider";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -37,6 +38,7 @@ export default function RootLayout({ children }) {
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
+            <WhatsAppFloat />
           </ToastProvider>
         </AuthProvider>
       </body>

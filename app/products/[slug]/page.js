@@ -4,13 +4,20 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, ShoppingCart, Star, ArrowLeft } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Star, ArrowLeft, MessageCircle } from "lucide-react";
 import { Button, Badge, Card } from "@/components/ui";
 import ProductCard from "@/components/products/ProductCard";
+import ProductSpecifications from "@/components/products/ProductSpecifications";
 import { useCartStore } from "@/store/cart";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
-import { formatPrice, getEffectivePrice, calculateDiscount } from "@/lib/utils";
+import {
+  formatProductPrice,
+  getEffectivePrice,
+  calculateDiscount,
+  isEnquiryProduct,
+} from "@/lib/utils";
+import { getProductEnquiryLink, hasSpecifications } from "@/lib/product-specs";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -83,10 +90,13 @@ export default function ProductDetailPage() {
   const { product, variants, reviews } = data;
   const price = selectedVariant?.price ?? getEffectivePrice(product);
   const discount = calculateDiscount(product.base_price, product.discount_price);
+  const enquiryOnly = isEnquiryProduct(product);
   const images = product.images?.length ? product.images : [null];
   const avgRating = reviews.length
     ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
     : 0;
+  const enquiryLink = getProductEnquiryLink(product);
+  const showSpecsTable = hasSpecifications(product.specifications);
 
   const handleAddToCart = () => {
     addItem(product, quantity, selectedVariant);
@@ -100,7 +110,6 @@ export default function ProductDetailPage() {
       </Link>
 
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16">
-        {/* Gallery */}
         <div>
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-50 mb-4">
             {images[selectedImage] ? (
@@ -135,14 +144,16 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        {/* Details */}
         <div>
           {product.categories && (
             <Badge className="mb-3">{product.categories.name}</Badge>
           )}
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-slate-900 mb-2">
             {product.name}
           </h1>
+          {product.model && (
+            <p className="text-sm text-slate-500 mb-3">Model: {product.model}</p>
+          )}
 
           {reviews.length > 0 && (
             <div className="flex items-center gap-2 mb-4">
@@ -159,16 +170,20 @@ export default function ProductDetailPage() {
           )}
 
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-3xl font-bold text-sky-600">{formatPrice(price)}</span>
-            {product.discount_price && !selectedVariant && (
+            <span className={`text-3xl font-bold ${enquiryOnly ? "text-slate-700" : "text-sky-600"}`}>
+              {formatProductPrice(product)}
+            </span>
+            {!enquiryOnly && product.discount_price && !selectedVariant && (
               <>
-                <span className="text-lg text-slate-400 line-through">{formatPrice(product.base_price)}</span>
+                <span className="text-lg text-slate-400 line-through">{formatProductPrice({ ...product, discount_price: null })}</span>
                 <Badge variant="danger">-{discount}%</Badge>
               </>
             )}
           </div>
 
-          <p className="text-slate-600 leading-relaxed mb-6">{product.description}</p>
+          {!showSpecsTable && product.description && (
+            <p className="text-slate-600 leading-relaxed mb-6">{product.description}</p>
+          )}
 
           {variants.length > 0 && (
             <div className="mb-6">
@@ -184,7 +199,7 @@ export default function ProductDetailPage() {
                         : "border-slate-200 hover:border-sky-300"
                     }`}
                   >
-                    {formatPrice(v.price)}
+                    {formatProductPrice({ base_price: v.price, discount_price: null })}
                     {v.attribute_combination && Object.keys(v.attribute_combination).length > 0 && (
                       <span className="text-slate-400 ml-1">
                         ({Object.values(v.attribute_combination).join(", ")})
@@ -196,31 +211,48 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          <div className="flex items-center gap-4 mb-6">
-            <p className="text-sm font-medium text-slate-700">Quantity</p>
-            <div className="flex items-center border border-slate-200 rounded-xl">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="p-2.5 hover:bg-slate-50 transition-colors"
-                aria-label="Decrease quantity"
-              >
-                <Minus className="h-4 w-4" />
-              </button>
-              <span className="px-4 font-medium">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="p-2.5 hover:bg-slate-50 transition-colors"
-                aria-label="Increase quantity"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
+          {!enquiryOnly && (
+            <div className="flex items-center gap-4 mb-6">
+              <p className="text-sm font-medium text-slate-700">Quantity</p>
+              <div className="flex items-center border border-slate-200 rounded-xl">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="p-2.5 hover:bg-slate-50 transition-colors"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="px-4 font-medium">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="p-2.5 hover:bg-slate-50 transition-colors"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
-          <Button size="lg" className="w-full sm:w-auto" onClick={handleAddToCart}>
-            <ShoppingCart className="h-5 w-5" />
-            Add to Cart
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href={enquiryLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex"
+            >
+              <Button size="lg" className="w-full sm:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white border-0">
+                <MessageCircle className="h-5 w-5" />
+                Enquire on WhatsApp
+              </Button>
+            </a>
+            {!enquiryOnly && (
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto" onClick={handleAddToCart}>
+                <ShoppingCart className="h-5 w-5" />
+                Add to Cart
+              </Button>
+            )}
+          </div>
 
           {product.sku && (
             <p className="text-xs text-slate-400 mt-4">SKU: {product.sku}</p>
@@ -228,7 +260,16 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      {/* Reviews */}
+      {showSpecsTable && (
+        <section className="mb-16 max-w-3xl">
+          <ProductSpecifications
+            specifications={product.specifications}
+            description={showSpecsTable ? null : product.description}
+            model={null}
+          />
+        </section>
+      )}
+
       {reviews.length > 0 && (
         <section className="mb-16">
           <h2 className="font-display text-2xl font-bold text-slate-900 mb-6">Customer Reviews</h2>
@@ -248,7 +289,6 @@ export default function ProductDetailPage() {
         </section>
       )}
 
-      {/* Related */}
       {related.length > 0 && (
         <section>
           <h2 className="font-display text-2xl font-bold text-slate-900 mb-6">Related Products</h2>

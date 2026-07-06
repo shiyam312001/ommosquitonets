@@ -79,7 +79,7 @@ export default function AdminCategoriesPage() {
               <tr className="border-b border-slate-100 text-left text-slate-500">
                 <th className="px-6 py-3 font-medium">Name</th>
                 <th className="px-6 py-3 font-medium">Slug</th>
-                <th className="px-6 py-3 font-medium">Parent</th>
+                <th className="px-6 py-3 font-medium">Description</th>
                 <th className="px-6 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
@@ -88,9 +88,7 @@ export default function AdminCategoriesPage() {
                 <tr key={cat.id} className="border-b border-slate-50 hover:bg-slate-50">
                   <td className="px-6 py-3 font-medium">{cat.name}</td>
                   <td className="px-6 py-3 text-slate-500">{cat.slug}</td>
-                  <td className="px-6 py-3 text-slate-500">
-                    {categories.find((c) => c.id === cat.parent_id)?.name || "—"}
-                  </td>
+                  <td className="px-6 py-3 text-slate-500 max-w-xs truncate">{cat.description || "—"}</td>
                   <td className="px-6 py-3 text-right">
                     <button onClick={() => openEdit(cat)} className="p-1.5 text-sky-600 hover:bg-sky-50 rounded-lg"><Pencil className="h-4 w-4" /></button>
                     <button onClick={() => handleDelete(cat.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="h-4 w-4" /></button>
