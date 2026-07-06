@@ -109,8 +109,8 @@ export default function ProductDetailPage() {
         <ArrowLeft className="h-4 w-4" /> Back to Shop
       </Link>
 
-      <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16">
-        <div>
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16 items-start">
+        <div className="md:sticky md:top-24">
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-50 mb-4">
             {images[selectedImage] ? (
               <Image
@@ -144,7 +144,7 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        <div>
+        <div className="flex flex-col min-w-0">
           {product.categories && (
             <Badge className="mb-3">{product.categories.name}</Badge>
           )}
@@ -257,18 +257,18 @@ export default function ProductDetailPage() {
           {product.sku && (
             <p className="text-xs text-slate-400 mt-4">SKU: {product.sku}</p>
           )}
+
+          {showSpecsTable && (
+            <div className="mt-8 pt-8 border-t border-slate-200 w-full">
+              <ProductSpecifications
+                specifications={product.specifications}
+                description={product.description}
+                model={null}
+              />
+            </div>
+          )}
         </div>
       </div>
-
-      {showSpecsTable && (
-        <section className="mb-16 max-w-3xl">
-          <ProductSpecifications
-            specifications={product.specifications}
-            description={showSpecsTable ? null : product.description}
-            model={null}
-          />
-        </section>
-      )}
 
       {reviews.length > 0 && (
         <section className="mb-16">
