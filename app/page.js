@@ -17,11 +17,8 @@ import { Button, Card } from "@/components/ui";
 import ProductCard from "@/components/products/ProductCard";
 import CategoryCard, { ProductSystemCard } from "@/components/categories/CategoryCard";
 import { getFeaturedProducts } from "@/lib/products";
-import {
-  CATEGORIES,
-  PRODUCT_SYSTEMS,
-  NET_BENEFITS,
-} from "@/lib/categories-content";
+import { getCategories, categoryToSystem } from "@/lib/categories";
+import { NET_BENEFITS } from "@/lib/categories-content";
 import { BUSINESS } from "@/lib/utils";
 import { SITE_IMAGES } from "@/lib/catalog-images";
 
@@ -72,8 +69,12 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  const featuredProducts = await getFeaturedProducts(8);
-  const topCategories = CATEGORIES.slice(0, 8);
+  const [featuredProducts, categories] = await Promise.all([
+    getFeaturedProducts(8),
+    getCategories(),
+  ]);
+  const topCategories = categories.slice(0, 8);
+  const productSystems = categories.slice(0, 4).map(categoryToSystem);
 
   return (
     <>
@@ -141,7 +142,7 @@ export default async function HomePage() {
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {PRODUCT_SYSTEMS.map((system) => (
+            {productSystems.map((system) => (
               <ProductSystemCard key={system.name} system={system} />
             ))}
           </div>

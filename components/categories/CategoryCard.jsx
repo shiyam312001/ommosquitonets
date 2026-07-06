@@ -2,8 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui";
+import { normalizeCategory } from "@/lib/category-utils";
 
-export default function CategoryCard({ category, variant = "default" }) {
+export default function CategoryCard({ category: raw, variant = "default" }) {
+  const category = normalizeCategory(raw);
+  if (!category) return null;
+
   if (variant === "compact") {
     return (
       <Link href={`/products?category=${category.slug}`}>
@@ -45,17 +49,23 @@ export default function CategoryCard({ category, variant = "default" }) {
           <div className="absolute inset-0 bg-sky-500/0 group-hover:bg-sky-500/10 transition-colors duration-300" />
         </div>
         <div className="p-5 flex flex-col flex-1">
-          <p className="text-xs font-medium text-sky-600 uppercase tracking-wide mb-1">
-            {category.group}
-          </p>
+          {category.group && (
+            <p className="text-xs font-medium text-sky-600 uppercase tracking-wide mb-1">
+              {category.group}
+            </p>
+          )}
           <h3 className="font-display font-semibold text-slate-900 text-lg mb-1 group-hover:text-sky-600 transition-colors">
             {category.name}
           </h3>
-          <p className="text-sm text-sky-700 font-medium mb-2">{category.tagline}</p>
-          <p className="text-sm text-slate-600 leading-relaxed mb-4 flex-1">
-            {category.description}
-          </p>
-          {category.features && (
+          {category.tagline && (
+            <p className="text-sm text-sky-700 font-medium mb-2">{category.tagline}</p>
+          )}
+          {category.description && (
+            <p className="text-sm text-slate-600 leading-relaxed mb-4 flex-1">
+              {category.description}
+            </p>
+          )}
+          {category.features?.length > 0 && (
             <ul className="flex flex-wrap gap-1.5 mb-4">
               {category.features.slice(0, 3).map((f) => (
                 <li

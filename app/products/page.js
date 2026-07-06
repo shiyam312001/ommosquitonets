@@ -6,7 +6,7 @@ import { SlidersHorizontal, Search, Package } from "lucide-react";
 import { Button, Select, ProductGridSkeleton } from "@/components/ui";
 import ProductCard from "@/components/products/ProductCard";
 import { createClient } from "@/lib/supabase/client";
-import { getCategoryBySlug, CATEGORIES } from "@/lib/categories-content";
+import { normalizeCategory } from "@/lib/category-utils";
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -73,24 +73,28 @@ function ProductsContent() {
 
   useEffect(() => {
     const supabase = createClient();
-    if (!supabase) {
-      setCategories(CATEGORIES.map((c) => ({ id: c.slug, name: c.name, slug: c.slug })));
-      return;
-    }
+    if (!supabase) return;
     supabase.from("categories").select("*").order("name").then(({ data }) => {
-      setCategories(data?.length ? data : CATEGORIES.map((c) => ({ id: c.slug, name: c.name, slug: c.slug })));
+      setCategories(data || []);
     });
     supabase.from("attributes").select("*, attribute_values(*)").order("name").then(({ data }) => setAttributes(data || []));
   }, []);
 
   const totalPages = Math.ceil(total / 12);
-  const activeCategory = filters.category ? getCategoryBySlug(filters.category) : null;
+  const activeCategoryRaw = filters.category
+    ? categories.find((c) => c.slug === filters.category)
+    : null;
+  const activeCategory = activeCategoryRaw ? normalizeCategory(activeCategoryRaw) : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       {activeCategory ? (
         <div className="mb-8 p-6 rounded-2xl bg-sky-50 border border-sky-100">
-          <p className="text-xs font-medium text-sky-500 uppercase tracking-wide mb-1">{activeCategory.group}</p>
+          {activeCategory.group && (
+            <p className="text-xs font-medium text-sky-500 uppercase tracking-wide mb-1">
+              {activeCategory.group}
+            </p>
+          )}
           <h1 className="font-display text-2xl md:text-3xl font-bold text-slate-900 mb-2">{activeCategory.name}</h1>
           <p className="text-slate-600 text-sm leading-relaxed max-w-2xl">{activeCategory.description}</p>
         </div>

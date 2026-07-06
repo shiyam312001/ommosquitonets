@@ -2,11 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
-import {
-  CATEGORIES,
-  CATEGORY_GROUPS,
-  getCategoriesByGroup,
-} from "@/lib/categories-content";
+import { getCategoriesGrouped } from "@/lib/categories";
 import { BUSINESS } from "@/lib/utils";
 
 export const metadata = {
@@ -15,7 +11,9 @@ export const metadata = {
     "Browse mosquito nets for doors, windows, balconies, beds & more. Pleated, magnetic, roller, Netlon & stainless steel mesh — custom fit with free installation in Chennai.",
 };
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const groups = await getCategoriesGrouped();
+
   return (
     <div>
       {/* Hero */}
@@ -36,27 +34,23 @@ export default function CategoriesPage() {
       </section>
 
       {/* Grouped categories */}
-      {CATEGORY_GROUPS.map((group) => {
-        const items = getCategoriesByGroup(group.title);
-        if (!items.length) return null;
-        return (
-          <section key={group.title} className="py-12 md:py-16 even:bg-slate-50">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-8">
-                <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-900 mb-2">
-                  {group.title}
-                </h2>
-                <p className="text-slate-600">{group.description}</p>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {items.map((cat) => (
-                  <CategoryCard key={cat.slug} category={cat} />
-                ))}
-              </div>
+      {groups.map((group) => (
+        <section key={group.title} className="py-12 md:py-16 even:bg-slate-50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-8">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+                {group.title}
+              </h2>
+              {group.description && <p className="text-slate-600">{group.description}</p>}
             </div>
-          </section>
-        );
-      })}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {group.items.map((cat) => (
+                <CategoryCard key={cat.slug} category={cat} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
 
       {/* CTA */}
       <section className="py-12 bg-sky-950">

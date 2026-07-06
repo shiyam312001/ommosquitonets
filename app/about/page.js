@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
-import { CATEGORIES, NET_BENEFITS } from "@/lib/categories-content";
+import { getCategories } from "@/lib/categories";
+import { NET_BENEFITS } from "@/lib/categories-content";
 import { BUSINESS } from "@/lib/utils";
 
 export const metadata = {
@@ -20,7 +21,8 @@ export const metadata = {
     "Om Mosquito Nets — Thiruverkadu-based specialists in custom mosquito nets, pleated systems, magnetic mesh & curtains for Chennai homes.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const categories = await getCategories();
   return (
     <div>
       {/* Hero */}
@@ -126,7 +128,7 @@ export default function AboutPage() {
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {CATEGORIES.slice(0, 6).map((cat) => (
+            {categories.slice(0, 6).map((cat) => (
               <CategoryCard key={cat.slug} category={cat} />
             ))}
           </div>
