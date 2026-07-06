@@ -23,6 +23,7 @@ import {
   NET_BENEFITS,
 } from "@/lib/categories-content";
 import { BUSINESS } from "@/lib/utils";
+import { SITE_IMAGES } from "@/lib/catalog-images";
 
 const features = [
   {
@@ -114,8 +115,8 @@ export default async function HomePage() {
             </div>
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800"
-                alt="Om Mosquito Nets — premium installation in Chennai"
+                src={SITE_IMAGES.hero}
+                alt="Professional mosquito net mesh installation — Om Mosquito Nets Chennai"
                 fill
                 className="object-cover"
                 priority
@@ -128,13 +129,13 @@ export default async function HomePage() {
       </section>
 
       {/* Product Systems */}
-      <section className="py-16 md:py-20 bg-sky-950">
+      <section className="py-16 md:py-20 bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
               Our Net Systems
             </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
+            <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed">
               Purpose-built solutions for every opening — engineered for Chennai homes,
               not off-the-shelf kits.
             </p>

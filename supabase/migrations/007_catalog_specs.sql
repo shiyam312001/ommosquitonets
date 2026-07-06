@@ -2,17 +2,19 @@
 ALTER TABLE products ADD COLUMN IF NOT EXISTS model TEXT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS specifications JSONB DEFAULT NULL;
 
+-- Royalty-free Unsplash images (https://unsplash.com/license)
+
 -- ============================================
 -- UPDATE CATEGORIES (new catalog structure)
 -- ============================================
 INSERT INTO categories (name, slug, description, image_url) VALUES
-  ('Window Openable', 'window-openable', '3 Types of Window Openable Systems', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600'),
-  ('Door Openable', 'door-openable', '3 Types of Door Openable Systems', 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600'),
-  ('Pleated System', 'pleated-system', '3 Types of Pleated Systems', 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=600'),
-  ('Velcro System', 'velcro-system', 'Velcro and magnetic mesh solutions for easy installation', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600'),
-  ('Sliding System', 'sliding-system', 'Smooth sliding mosquito net systems for windows and doors', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600'),
-  ('Rollup System', 'rollup-system', 'Roll-up roller mosquito nets for compact storage', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600'),
-  ('Honey Comb', 'honey-comb', 'Honeycomb fabric pleated insect screen systems', 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=600')
+  ('Window Openable', 'window-openable', '3 Types of Window Openable Systems', 'https://images.unsplash.com/photo-1758998222336-d48b2390a686?w=800&q=80&auto=format&fit=crop'),
+  ('Door Openable', 'door-openable', '3 Types of Door Openable Systems', 'https://images.unsplash.com/photo-1761052056661-05a554df6ff4?w=800&q=80&auto=format&fit=crop'),
+  ('Pleated System', 'pleated-system', '3 Types of Pleated Systems', 'https://images.unsplash.com/photo-1767032915447-a09b88e07b0c?w=800&q=80&auto=format&fit=crop'),
+  ('Velcro System', 'velcro-system', 'Velcro and magnetic mesh solutions for easy installation', 'https://images.unsplash.com/photo-1533633310920-cc9bf1e7f9b0?w=800&q=80&auto=format&fit=crop'),
+  ('Sliding System', 'sliding-system', 'Smooth sliding mosquito net systems for windows and doors', 'https://images.unsplash.com/photo-1758998222336-d48b2390a686?w=800&q=80&auto=format&fit=crop'),
+  ('Rollup System', 'rollup-system', 'Roll-up roller mosquito nets for compact storage', 'https://images.unsplash.com/photo-1776261293170-66fd3b09273e?w=800&q=80&auto=format&fit=crop'),
+  ('Honey Comb', 'honey-comb', 'Honeycomb fabric pleated insect screen systems', 'https://images.unsplash.com/photo-1642219046655-caa5ff2b78a0?w=800&q=80&auto=format&fit=crop')
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,
   description = EXCLUDED.description,
@@ -32,7 +34,7 @@ VALUES (
   $json${"sizeRange":"Width 20mm, Thick 8mm","profile":"Aluminium 6063 Alloy","coating":"PP Coating (50-70 microns)","components":"Virgin HD Plastic","mesh":"SS 304 Black Coated","installation":"Customized","lockMode":"Stopper","rubber":"EPDM Rubbers","verification":"ISO 9001:2015 Certified"}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'window-openable' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800']
+  ARRAY['https://images.unsplash.com/photo-1758998222336-d48b2390a686?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -47,7 +49,7 @@ VALUES (
   $json${"sizeRange":"Width 25mm, Thick 8mm","profile":"Aluminium 6063 Alloy","coating":"PP Coating (50-70 microns)","components":"Virgin HD Plastic","mesh":"SS 304 Black Coated","installation":"Customized","lockMode":"Stopper","rubber":"EPDM Rubbers","verification":"ISO 9001:2015 Certified"}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'window-openable' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800']
+  ARRAY['https://images.unsplash.com/photo-1767032915447-a09b88e07b0c?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -62,7 +64,7 @@ VALUES (
   $json${"sizeRange":"Width 20mm, Thick 8mm","profile":"Aluminium 6063 Alloy","coating":"PP Coating (50-70 microns)","components":"Virgin HD Plastic","mesh":"SS 304 Black Coated","installation":"Customized","lockMode":"Stopper","rubber":"EPDM Rubbers","verification":"ISO 9001:2015 Certified"}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'window-openable' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800']
+  ARRAY['https://images.unsplash.com/photo-1761052056661-05a554df6ff4?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -77,7 +79,7 @@ VALUES (
   $json${"sizeRange":"Outer 45mm, Thick 18mm, Middle 40mm","profile":"Aluminium 6063 Alloy","coating":"PP Coating (50-70 microns)","components":"Virgin HD Plastic","mesh":"SS 304 Black Coated, Pet Mesh","handle":"Aluminium Coated Handles","installation":"Customized","lockMode":"Magnetic Strip (A+B)","woolPile":"Silicate Weather Strip","rubber":"EPDM Rubbers","verification":"ISO 9001:2015 Certified"}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'door-openable' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800']
+  ARRAY['https://images.unsplash.com/photo-1761052056661-05a554df6ff4?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -92,7 +94,7 @@ VALUES (
   $json${"sizeRange":"Outer 45mm, Thick 18mm, Middle 120mm","profile":"Aluminium 6063 Alloy","coating":"PP Coating (50-70 microns)","components":"Virgin HD Plastic","mesh":"SS 304 Black Coated, Pet Mesh","handle":"Aluminium Coated Handles","installation":"Customized","lockMode":"Magnetic Strip (A+B)","woolPile":"Silicate Weather Strip","rubber":"EPDM Rubbers","verification":"ISO 9001:2015 Certified"}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'door-openable' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800']
+  ARRAY['https://images.unsplash.com/photo-1758998222336-d48b2390a686?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -107,7 +109,7 @@ VALUES (
   NULL,
   (SELECT id FROM categories WHERE slug = 'door-openable' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800']
+  ARRAY['https://images.unsplash.com/photo-1601583438330-a61d0df44f1f?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -122,7 +124,7 @@ VALUES (
   $json${"sizeRange":"Width 30mm, Thick 25mm","profile":"Aluminium 6063 Alloy","coating":"PP Coating (50-70 microns)","components":"Virgin HD Plastics","mesh":"Fiberglass, PP, Honeycomb Fabrics, SS 304","lockMode":"Inside Rail Hook","woolPile":"Silicate Weather Strip","installation":"Customized","verification":"ISO 9001:2015 Certified"}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'pleated-system' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800']
+  ARRAY['https://images.unsplash.com/photo-1767032915447-a09b88e07b0c?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -137,7 +139,7 @@ VALUES (
   $json${"material":"Fiberglass","usage":"Home Windows","packing":"Color Box","description":"Screens Spline Roller is a tool needed for DIY screens. It works by rolling the screen into the frame."}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'pleated-system' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800']
+  ARRAY['https://images.unsplash.com/photo-1642219046655-caa5ff2b78a0?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -152,7 +154,7 @@ VALUES (
   $json${"material":"Fiberglass","usage":"Home Windows","packing":"Color Box","description":"Screens Spline Roller is a tool needed for DIY screens. It works by rolling the screen into the frame."}$json$::jsonb,
   (SELECT id FROM categories WHERE slug = 'pleated-system' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800']
+  ARRAY['https://images.unsplash.com/photo-1776261293170-66fd3b09273e?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -166,7 +168,7 @@ VALUES (
   NULL, NULL,
   (SELECT id FROM categories WHERE slug = 'velcro-system' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800']
+  ARRAY['https://images.unsplash.com/photo-1533633310920-cc9bf1e7f9b0?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -180,7 +182,7 @@ VALUES (
   NULL, NULL,
   (SELECT id FROM categories WHERE slug = 'velcro-system' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800']
+  ARRAY['https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
@@ -194,7 +196,7 @@ VALUES (
   NULL, NULL,
   (SELECT id FROM categories WHERE slug = 'velcro-system' LIMIT 1),
   0, 999, TRUE, TRUE,
-  ARRAY['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800']
+  ARRAY['https://images.unsplash.com/photo-1533633310920-cc9bf1e7f9b0?w=800&q=80&auto=format&fit=crop']
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name, description = EXCLUDED.description, model = EXCLUDED.model,
