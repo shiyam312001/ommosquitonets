@@ -1,13 +1,28 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Phone, MapPin, Share2, Mail } from "lucide-react";
 import Logo from "@/components/layout/Logo";
 import { BUSINESS } from "@/lib/utils";
+import { getRootCategories } from "@/lib/category-utils";
 
-export default function Footer() {
+export default function Footer({ categories: initialCategories = [] }) {
   const pathname = usePathname();
+  const [categories, setCategories] = useState(initialCategories);
+
+  useEffect(() => {
+    if (initialCategories.length) {
+      setCategories(initialCategories);
+      return;
+    }
+
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data) => setCategories(getRootCategories(data)))
+      .catch(() => {});
+  }, [initialCategories]);
 
   if (pathname.startsWith("/manage")) return null;
 
@@ -27,7 +42,6 @@ export default function Footer() {
             <h3 className="font-display font-semibold text-white mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/" className="hover:text-sky-400 transition-colors">Home</Link></li>
-              <li><Link href="/products" className="hover:text-sky-400 transition-colors">Shop</Link></li>
               <li><Link href="/categories" className="hover:text-sky-400 transition-colors">Categories</Link></li>
               <li><Link href="/about" className="hover:text-sky-400 transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-sky-400 transition-colors">Contact</Link></li>
@@ -37,32 +51,46 @@ export default function Footer() {
 
           <div>
             <h3 className="font-display font-semibold text-white mb-4">Categories</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/categories" className="hover:text-sky-400 transition-colors">All Categories</Link></li>
-              <li><Link href="/products?category=window-openable" className="hover:text-sky-400 transition-colors">Window Openable</Link></li>
-              <li><Link href="/products?category=door-openable" className="hover:text-sky-400 transition-colors">Door Openable</Link></li>
-              <li><Link href="/products?category=pleated-system" className="hover:text-sky-400 transition-colors">Pleated System</Link></li>
-              <li><Link href="/products?category=velcro-system" className="hover:text-sky-400 transition-colors">Velcro System</Link></li>
-              <li><Link href="/products?category=sliding-system" className="hover:text-sky-400 transition-colors">Sliding System</Link></li>
-            </ul>
+            <nav aria-label="Footer categories">
+              <ul className="space-y-2 text-sm columns-1 sm:columns-2 lg:columns-1">
+                <li className="break-inside-avoid">
+                  <Link
+                    href="/categories"
+                    className="font-medium text-sky-300 hover:text-sky-200 transition-colors"
+                  >
+                    All Categories
+                  </Link>
+                </li>
+                {categories.map((cat) => (
+                  <li key={cat.slug} className="break-inside-avoid">
+                    <Link
+                      href={`/categories/${cat.slug}`}
+                      className="text-slate-400 hover:text-sky-300 transition-colors"
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
 
           <div>
             <h3 className="font-display font-semibold text-white mb-4">Contact Us</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-sky-400" />
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-sky-400" aria-hidden="true" />
                 <span>{BUSINESS.address}</span>
               </li>
               <li>
                 <a href={`tel:${BUSINESS.phoneRaw}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
-                  <Phone className="h-4 w-4 text-sky-400" />
+                  <Phone className="h-4 w-4 text-sky-400" aria-hidden="true" />
                   {BUSINESS.phone}
                 </a>
               </li>
               <li>
                 <a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
-                  <Mail className="h-4 w-4 text-sky-400" />
+                  <Mail className="h-4 w-4 text-sky-400" aria-hidden="true" />
                   {BUSINESS.email}
                 </a>
               </li>
@@ -73,7 +101,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 hover:text-sky-400 transition-colors"
                 >
-                  <Share2 className="h-4 w-4 text-sky-400" />
+                  <Share2 className="h-4 w-4 text-sky-400" aria-hidden="true" />
                   @ommosquitonets
                 </a>
               </li>

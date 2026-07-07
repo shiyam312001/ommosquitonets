@@ -1,46 +1,112 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
-import { Button, Input, Textarea, Card, Modal } from "@/components/ui";
+import { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
+import { Plus, Pencil, Trash2, ChevronRight, FolderTree } from "lucide-react";
+import { Button, Input, Textarea, Card, Modal, Badge } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
+import { getCategoryImage } from "@/lib/catalog-images";
+
+const emptyForm = {
+  name: "",
+  description: "",
+  tagline: "",
+  image_url: "",
+  parent_id: "",
+  features: "",
+  specifications: "",
+  sort_order: "0",
+};
+
+function parseSpecs(text) {
+  if (!text?.trim()) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function formatSpecs(specs) {
+  if (!specs) return "";
+  return JSON.stringify(specs, null, 2);
+}
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: "", description: "", image_url: "", parent_id: "" });
+  const [form, setForm] = useState(emptyForm);
+  const [specError, setSpecError] = useState("");
   const { addToast } = useToast();
   const supabase = createClient();
 
   const load = async () => {
-    const { data } = await supabase.from("categories").select("*").order("name");
+    const { data } = await supabase
+      .from("categories")
+      .select("*")
+      .order("sort_order")
+      .order("name");
     setCategories(data || []);
   };
 
   useEffect(() => { load(); }, []);
 
-  const openCreate = () => {
+  const tree = useMemo(() => {
+    const roots = categories.filter((c) => !c.parent_id);
+    return roots.map((root) => ({
+      ...root,
+      children: categories.filter((c) => c.parent_id === root.id),
+    }));
+  }, [categories]);
+
+  const openCreate = (parentId = "") => {
     setEditing(null);
-    setForm({ name: "", description: "", image_url: "", parent_id: "" });
+    setForm({ ...emptyForm, parent_id: parentId });
+    setSpecError("");
     setModalOpen(true);
   };
 
   const openEdit = (cat) => {
     setEditing(cat);
-    setForm({ name: cat.name, description: cat.description || "", image_url: cat.image_url || "", parent_id: cat.parent_id || "" });
+    setForm({
+      name: cat.name,
+      description: cat.description || "",
+      tagline: cat.tagline || "",
+      image_url: cat.image_url || "",
+      parent_id: cat.parent_id || "",
+      features: cat.features?.join(", ") || "",
+      specifications: formatSpecs(cat.specifications),
+      sort_order: String(cat.sort_order ?? 0),
+    });
+    setSpecError("");
     setModalOpen(true);
   };
 
   const handleSave = async () => {
+    const specs = parseSpecs(form.specifications);
+    if (form.specifications.trim() && !specs) {
+      setSpecError("Invalid JSON format for specifications");
+      return;
+    }
+    setSpecError("");
+
+    const features = form.features
+      ? form.features.split(",").map((f) => f.trim()).filter(Boolean)
+      : null;
+
     const payload = {
       name: form.name,
-      slug: slugify(form.name),
-      description: form.description,
+      slug: editing ? editing.slug : slugify(form.name),
+      description: form.description || null,
+      tagline: form.tagline || null,
       image_url: form.image_url || null,
       parent_id: form.parent_id || null,
+      features: features?.length ? features : null,
+      specifications: specs,
+      sort_order: parseInt(form.sort_order, 10) || 0,
     };
 
     if (editing) {
@@ -58,64 +124,153 @@ export default function AdminCategoriesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this category?")) return;
+    if (!confirm("Delete this category? Subcategories will lose their parent.")) return;
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) { addToast(error.message, "error"); return; }
     addToast("Category deleted", "info");
     load();
   };
 
+  const parentOptions = categories.filter((c) => c.id !== editing?.id);
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold text-slate-900">Categories</h1>
-        <Button onClick={openCreate}><Plus className="h-4 w-4" /> Add Category</Button>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-slate-900">Categories</h1>
+          <p className="text-slate-500 text-sm mt-1">Manage categories, subcategories & specifications</p>
+        </div>
+        <Button onClick={() => openCreate()}><Plus className="h-4 w-4" /> Add Category</Button>
       </div>
 
-      <Card padding={false}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-left text-slate-500">
-                <th className="px-6 py-3 font-medium">Name</th>
-                <th className="px-6 py-3 font-medium">Slug</th>
-                <th className="px-6 py-3 font-medium">Description</th>
-                <th className="px-6 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((cat) => (
-                <tr key={cat.id} className="border-b border-slate-50 hover:bg-slate-50">
-                  <td className="px-6 py-3 font-medium">{cat.name}</td>
-                  <td className="px-6 py-3 text-slate-500">{cat.slug}</td>
-                  <td className="px-6 py-3 text-slate-500 max-w-xs truncate">{cat.description || "—"}</td>
-                  <td className="px-6 py-3 text-right">
-                    <button onClick={() => openEdit(cat)} className="p-1.5 text-sky-600 hover:bg-sky-50 rounded-lg"><Pencil className="h-4 w-4" /></button>
-                    <button onClick={() => handleDelete(cat.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="h-4 w-4" /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      <div className="space-y-4">
+        {tree.map((root) => (
+          <Card key={root.id} padding={false} className="overflow-hidden border-0 shadow-md">
+            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-sky-50 to-white border-b border-slate-100">
+              <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 shadow-sm">
+                <Image
+                  src={root.image_url || getCategoryImage(root.slug)}
+                  alt={root.name}
+                  fill
+                  className="object-cover"
+                  sizes="56px"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-display font-bold text-slate-900">{root.name}</h3>
+                  <Badge variant="default">Parent</Badge>
+                  {root.specifications && <Badge variant="slate">Has Specs</Badge>}
+                </div>
+                {root.tagline && <p className="text-sm text-sky-600 mt-0.5">{root.tagline}</p>}
+                <p className="text-xs text-slate-400 mt-0.5">/{root.slug}</p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => openCreate(root.id)}
+                  className="p-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg text-xs font-medium"
+                  title="Add subcategory"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+                <button onClick={() => openEdit(root)} className="p-2 text-sky-600 hover:bg-sky-50 rounded-lg">
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button onClick={() => handleDelete(root.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {root.children.length > 0 && (
+              <div className="divide-y divide-slate-50">
+                {root.children.map((child) => (
+                  <div key={child.id} className="flex items-center gap-4 p-4 pl-8 hover:bg-slate-50/50 transition-colors">
+                    <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0">
+                      <Image
+                        src={child.image_url || getCategoryImage(child.slug)}
+                        alt={child.name}
+                        fill
+                        className="object-cover"
+                        sizes="40px"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-slate-800">{child.name}</p>
+                        <Badge variant="slate" className="text-xs">Subcategory</Badge>
+                        {child.specifications && <Badge variant="slate" className="text-xs">Specs</Badge>}
+                      </div>
+                      {child.tagline && <p className="text-xs text-slate-500">{child.tagline}</p>}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={() => openEdit(child)} className="p-1.5 text-sky-600 hover:bg-sky-50 rounded-lg">
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button onClick={() => handleDelete(child.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {root.children.length === 0 && (
+              <div className="px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
+                <FolderTree className="h-4 w-4" />
+                No subcategories — add types under this category
+              </div>
+            )}
+          </Card>
+        ))}
+
+        {tree.length === 0 && (
+          <Card className="text-center py-12 text-slate-500">
+            No categories yet. Click &quot;Add Category&quot; to get started.
+          </Card>
+        )}
+      </div>
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? "Edit Category" : "New Category"}>
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
           <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <Input label="Tagline" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Short highlight text" />
           <Textarea label="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           <Input label="Image URL" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-          <select
-            value={form.parent_id}
-            onChange={(e) => setForm({ ...form, parent_id: e.target.value })}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200"
-          >
-            <option value="">No Parent</option>
-            {categories.filter((c) => c.id !== editing?.id).map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-          <Button onClick={handleSave} className="w-full">{editing ? "Update" : "Create"}</Button>
+          <Input
+            label="Features (comma-separated)"
+            value={form.features}
+            onChange={(e) => setForm({ ...form, features: e.target.value })}
+            placeholder="SS 304 mesh, Custom sizing, ISO certified"
+          />
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Specifications (JSON)</label>
+            <textarea
+              value={form.specifications}
+              onChange={(e) => setForm({ ...form, specifications: e.target.value })}
+              rows={6}
+              placeholder='{"mesh": "SS 304 Black Coated", "profile": "Aluminium 6063"}'
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-sky-500"
+            />
+            {specError && <p className="text-red-500 text-xs mt-1">{specError}</p>}
+          </div>
+          <Input label="Sort Order" type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} />
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Parent Category</label>
+            <select
+              value={form.parent_id}
+              onChange={(e) => setForm({ ...form, parent_id: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+              <option value="">No Parent (top-level category)</option>
+              {parentOptions.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          <Button onClick={handleSave} className="w-full">{editing ? "Update Category" : "Create Category"}</Button>
         </div>
       </Modal>
     </div>

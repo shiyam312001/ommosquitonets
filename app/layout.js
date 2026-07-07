@@ -6,6 +6,8 @@ import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import { CartHydration } from "@/components/CartHydration";
 import { AuthProvider } from "@/context/AuthProvider";
 import { ToastProvider } from "@/components/ui/Toast";
+import { getCategories } from "@/lib/categories";
+import { getRootCategories } from "@/lib/category-utils";
 
 const poppins = Poppins({
   variable: "--font-display",
@@ -28,7 +30,10 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const categories = await getCategories();
+  const footerCategories = getRootCategories(categories);
+
   return (
     <html lang="en" className={`${poppins.variable} ${inter.variable} scroll-smooth`}>
       <body className="min-h-screen flex flex-col font-body bg-white text-slate-900 antialiased">
@@ -37,7 +42,7 @@ export default function RootLayout({ children }) {
             <CartHydration />
             <Header />
             <main className="flex-1">{children}</main>
-            <Footer />
+            <Footer categories={footerCategories} />
             <WhatsAppFloat />
           </ToastProvider>
         </AuthProvider>

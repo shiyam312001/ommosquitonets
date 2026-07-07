@@ -10,6 +10,7 @@ import {
   ShoppingBag,
   Users,
   MessageCircle,
+  Share2,
   ArrowLeft,
   LogOut,
 } from "lucide-react";
@@ -19,8 +20,9 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/manage", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/manage/products", label: "Products", icon: Package },
   { href: "/manage/categories", label: "Categories", icon: FolderTree },
+  { href: "/manage/instagram", label: "Instagram", icon: Share2 },
+  { href: "/manage/products", label: "Products", icon: Package },
   { href: "/manage/attributes", label: "Attributes", icon: Tags },
   { href: "/manage/orders", label: "Orders", icon: ShoppingBag },
   { href: "/manage/users", label: "Users", icon: Users },

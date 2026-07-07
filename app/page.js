@@ -14,10 +14,11 @@ import {
   IndianRupee,
 } from "lucide-react";
 import { Button, Card } from "@/components/ui";
-import ProductCard from "@/components/products/ProductCard";
-import CategoryCard, { ProductSystemCard } from "@/components/categories/CategoryCard";
-import { getFeaturedProducts } from "@/lib/products";
+import CategoryCard from "@/components/categories/CategoryCard";
+import NetSystemsSection, { FEATURED_SLUGS } from "@/components/home/NetSystemsSection";
+import InstagramGallery from "@/components/home/InstagramGallery";
 import { getCategories, categoryToSystem } from "@/lib/categories";
+import { getInstagramVideos } from "@/lib/instagram";
 import { NET_BENEFITS } from "@/lib/categories-content";
 import { BUSINESS } from "@/lib/utils";
 import { SITE_IMAGES } from "@/lib/catalog-images";
@@ -69,12 +70,22 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  const [featuredProducts, categories] = await Promise.all([
-    getFeaturedProducts(8),
+  const [categories, instagramVideos] = await Promise.all([
     getCategories(),
+    getInstagramVideos(),
   ]);
-  const topCategories = categories.slice(0, 8);
-  const productSystems = categories.slice(0, 4).map(categoryToSystem);
+
+  const rootCategories = categories
+    .filter((c) => !c.parent_id)
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+  const featuredRoots = FEATURED_SLUGS.map((slug) =>
+    rootCategories.find((c) => c.slug === slug)
+  ).filter(Boolean);
+
+  const productSystems = (featuredRoots.length ? featuredRoots : rootCategories)
+    .slice(0, 4)
+    .map(categoryToSystem);
 
   return (
     <>
@@ -101,7 +112,7 @@ export default async function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/categories">
-                  <Button size="lg" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto shadow-lg shadow-sky-500/20">
                     Browse Categories
                     <ArrowRight className="h-4 w-4" />
                   </Button>
@@ -114,7 +125,7 @@ export default async function HomePage() {
                 </a>
               </div>
             </div>
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-slate-200/50">
               <Image
                 src={SITE_IMAGES.hero}
                 alt="Professional mosquito net mesh installation — Om Mosquito Nets Chennai"
@@ -129,25 +140,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Product Systems */}
-      <section className="py-16 md:py-20 bg-slate-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
-              Our Net Systems
-            </h2>
-            <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              Purpose-built solutions for every opening — engineered for Chennai homes,
-              not off-the-shelf kits.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {productSystems.map((system) => (
-              <ProductSystemCard key={system.name} system={system} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <NetSystemsSection systems={productSystems} />
+
+      {/* Instagram Video Gallery */}
+      <InstagramGallery videos={instagramVideos} />
 
       {/* Categories */}
       <section className="py-16 md:py-20 bg-white">
@@ -155,7 +151,7 @@ export default async function HomePage() {
           <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-                Shop by Category
+                Browse by Category
               </h2>
               <p className="text-slate-600">
                 Door nets, window rollers, pleated balconies, magnetic mesh & more
@@ -163,45 +159,21 @@ export default async function HomePage() {
             </div>
             <Link
               href="/categories"
-              className="hidden sm:flex items-center gap-1 text-sky-600 font-medium hover:text-sky-700"
+              className="hidden sm:flex items-center gap-1 text-sky-600 font-medium hover:text-sky-700 hover:gap-2 transition-all"
             >
               All Categories <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {topCategories.map((cat) => (
+            {rootCategories.map((cat) => (
               <CategoryCard key={cat.slug} category={cat} variant="compact" />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Products */}
-      {featuredProducts.length > 0 && (
-        <section className="py-16 md:py-20 bg-slate-50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-10">
-              <div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-                  Popular Products
-                </h2>
-                <p className="text-slate-600">Best-selling nets & curtains in Chennai</p>
-              </div>
-              <Link href="/products" className="hidden sm:flex items-center gap-1 text-sky-600 font-medium hover:text-sky-700">
-                View All <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Why mosquito nets */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
@@ -222,7 +194,7 @@ export default async function HomePage() {
               {NET_BENEFITS.map((b, i) => {
                 const Icon = benefitIcons[i] || Shield;
                 return (
-                  <Card key={b.title} className="flex gap-3">
+                  <Card key={b.title} className="flex gap-3 border-0 shadow-sm">
                     <div className="shrink-0 flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-600">
                       <Icon className="h-5 w-5" />
                     </div>
@@ -239,7 +211,7 @@ export default async function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 md:py-20 bg-slate-50">
+      <section className="py-16 md:py-20 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-4">
@@ -250,7 +222,7 @@ export default async function HomePage() {
             {features.map((f) => {
               const Icon = f.icon;
               return (
-                <Card key={f.title} className="text-center">
+                <Card key={f.title} className="text-center border-0 shadow-md hover:shadow-lg transition-shadow">
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-600 mb-4">
                     <Icon className="h-7 w-7" />
                   </div>
@@ -264,7 +236,7 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-4">
@@ -273,7 +245,7 @@ export default async function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
-              <Card key={t.name}>
+              <Card key={t.name} className="border-0 shadow-md">
                 <div className="flex gap-1 mb-3">
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
@@ -312,7 +284,7 @@ export default async function HomePage() {
                 </a>
               </div>
             </div>
-            <div className="rounded-xl overflow-hidden h-48 md:h-56 bg-slate-800">
+            <div className="rounded-xl overflow-hidden h-48 md:h-56 bg-slate-800 ring-1 ring-white/10">
               <iframe
                 title="Om Mosquito Nets Location"
                 src="https://maps.google.com/maps?q=Kamadhenu+Nagar+Thiruverkadu+Chennai&output=embed"
