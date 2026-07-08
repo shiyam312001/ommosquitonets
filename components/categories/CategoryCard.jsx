@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import RemoteImage from "@/components/ui/RemoteImage";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui";
 import { normalizeCategory } from "@/lib/category-utils";
@@ -15,7 +15,7 @@ export default function CategoryCard({ category: raw, variant = "default" }) {
       <Link href={href} className="group block h-full">
         <Card hover padding={false} className="overflow-hidden h-full border-0 shadow-md hover:shadow-xl transition-all duration-300">
           <div className="relative aspect-[4/3] overflow-hidden">
-            <Image
+            <RemoteImage
               src={category.image}
               alt={`${category.name} — mosquito net category`}
               fill
@@ -51,7 +51,7 @@ export default function CategoryCard({ category: raw, variant = "default" }) {
           className="overflow-hidden h-full border border-slate-100 shadow-sm hover:shadow-xl hover:border-sky-200 transition-all duration-300"
         >
           <div className="relative aspect-[16/11] overflow-hidden">
-            <Image
+            <RemoteImage
               src={category.image}
               alt={category.name}
               fill
@@ -87,7 +87,7 @@ export default function CategoryCard({ category: raw, variant = "default" }) {
         className="overflow-hidden h-full flex flex-col border-0 shadow-md hover:shadow-2xl transition-all duration-300"
       >
         <div className="relative aspect-[16/10] overflow-hidden">
-          <Image
+          <RemoteImage
             src={category.image}
             alt={`${category.name} — mosquito net category`}
             fill
@@ -141,7 +141,7 @@ export function ProductSystemCard({ system, index = 0 }) {
       className="group relative flex h-full min-h-[22rem] flex-col overflow-hidden rounded-2xl ring-1 ring-white/10 transition-all duration-500 hover:ring-sky-400/50 hover:shadow-2xl hover:shadow-sky-950/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
     >
       <article className="relative flex h-full min-h-[22rem] flex-col">
-        <Image
+        <RemoteImage
           src={system.image}
           alt=""
           fill

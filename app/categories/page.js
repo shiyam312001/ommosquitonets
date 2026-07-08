@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import RemoteImage from "@/components/ui/RemoteImage";
 import { ArrowRight, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
@@ -60,7 +60,7 @@ export default async function CategoriesPage() {
               </div>
               {group.image && (
                 <div className="relative w-full md:w-48 h-32 rounded-2xl overflow-hidden shadow-lg shrink-0 hidden md:block">
-                  <Image
+                  <RemoteImage
                     src={group.image}
                     alt={group.title}
                     fill

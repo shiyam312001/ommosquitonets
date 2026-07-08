@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import RemoteImage from "@/components/ui/RemoteImage";
 import { MessageCircle, Phone, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
@@ -75,7 +75,7 @@ export default function CategoryDetailView({ category: raw, parent, children }) 
             </div>
 
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
-              <Image
+              <RemoteImage
                 src={category.image}
                 alt={category.name}
                 fill
@@ -132,7 +132,7 @@ export default function CategoryDetailView({ category: raw, parent, children }) 
             Message us on WhatsApp with your requirements. We offer free site visits across Chennai.
           </p>
           <a href={enquiryLink} target="_blank" rel="noopener noreferrer">
-            <Button size="lg" className="bg-white text-sky-700 hover:bg-sky-50 shadow-lg">
+            <Button size="lg" className="bg-sky-40 text-sky-700 hover:bg-sky-50 shadow-lg">
               <MessageCircle className="h-5 w-5" />
               Enquire on WhatsApp
             </Button>

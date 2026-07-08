@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
-import { Plus, Pencil, Trash2, ChevronRight, FolderTree } from "lucide-react";
+import RemoteImage from "@/components/ui/RemoteImage";
+import { Plus, Pencil, Trash2, ChevronRight, FolderTree, Upload, X } from "lucide-react";
 import { Button, Input, Textarea, Card, Modal, Badge } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
@@ -40,6 +40,7 @@ export default function AdminCategoriesPage() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [specError, setSpecError] = useState("");
+  const [uploading, setUploading] = useState(false);
   const { addToast } = useToast();
   const supabase = createClient();
 
@@ -83,6 +84,38 @@ export default function AdminCategoriesPage() {
     });
     setSpecError("");
     setModalOpen(true);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      body.append("folder", "categories");
+
+      const res = await fetch("/api/upload", { method: "POST", body });
+      const data = await res.json();
+
+      if (!res.ok) {
+        addToast(data.error || "Upload failed", "error");
+        return;
+      }
+
+      setForm((prev) => ({ ...prev, image_url: data.url }));
+      addToast("Image uploaded");
+    } catch (err) {
+      addToast(err.message || "Upload failed", "error");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setForm((prev) => ({ ...prev, image_url: "" }));
   };
 
   const handleSave = async () => {
@@ -132,6 +165,7 @@ export default function AdminCategoriesPage() {
   };
 
   const parentOptions = categories.filter((c) => c.id !== editing?.id);
+  const previewImage = form.image_url || (editing ? getCategoryImage(editing.slug) : null);
 
   return (
     <div>
@@ -148,7 +182,7 @@ export default function AdminCategoriesPage() {
           <Card key={root.id} padding={false} className="overflow-hidden border-0 shadow-md">
             <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-sky-50 to-white border-b border-slate-100">
               <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 shadow-sm">
-                <Image
+                <RemoteImage
                   src={root.image_url || getCategoryImage(root.slug)}
                   alt={root.name}
                   fill
@@ -188,7 +222,7 @@ export default function AdminCategoriesPage() {
                   <div key={child.id} className="flex items-center gap-4 p-4 pl-8 hover:bg-slate-50/50 transition-colors">
                     <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
                     <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                      <Image
+                      <RemoteImage
                         src={child.image_url || getCategoryImage(child.slug)}
                         alt={child.name}
                         fill
@@ -238,7 +272,63 @@ export default function AdminCategoriesPage() {
           <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <Input label="Tagline" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Short highlight text" />
           <Textarea label="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          <Input label="Image URL" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Category Image</label>
+            <div className="rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
+              {previewImage ? (
+                <div className="relative aspect-[16/10] w-full">
+                  <RemoteImage
+                    src={previewImage}
+                    alt="Category preview"
+                    fill
+                    className="object-cover"
+                    sizes="400px"
+                  />
+                  {form.image_url && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/70 text-white hover:bg-red-600 transition-colors"
+                      title="Remove image"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-500 mb-3">
+                    <Upload className="h-5 w-5" />
+                  </div>
+                  <p className="text-sm text-slate-500 mb-3">JPG, PNG or WebP — max 5MB</p>
+                </div>
+              )}
+              <div className="flex items-center gap-3 border-t border-slate-200 bg-white p-3">
+                <label className="inline-flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 cursor-pointer hover:bg-slate-50 transition-colors">
+                  {uploading ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
+                      Uploading…
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      {form.image_url ? "Replace image" : "Upload image"}
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
           <Input
             label="Features (comma-separated)"
             value={form.features}
@@ -270,7 +360,9 @@ export default function AdminCategoriesPage() {
               ))}
             </select>
           </div>
-          <Button onClick={handleSave} className="w-full">{editing ? "Update Category" : "Create Category"}</Button>
+          <Button onClick={handleSave} className="w-full" disabled={uploading}>
+            {editing ? "Update Category" : "Create Category"}
+          </Button>
         </div>
       </Modal>
     </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import RemoteImage from "@/components/ui/RemoteImage";
 import { ChevronDown, ArrowRight, Grid3X3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCategoryTree } from "@/lib/category-utils";
@@ -89,7 +89,7 @@ export default function CategoriesDropdown({ isActive }) {
                 <div className="p-4">
                   <div className="flex gap-4 mb-4">
                     <div className="relative w-24 h-24 rounded-xl overflow-hidden shrink-0 shadow-md">
-                      <Image
+                      <RemoteImage
                         src={active.image}
                         alt={active.name}
                         fill
@@ -129,7 +129,7 @@ export default function CategoriesDropdown({ isActive }) {
                             onClick={() => setOpen(false)}
                           >
                             <div className="relative w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                              <Image
+                              <RemoteImage
                                 src={child.image}
                                 alt={child.name}
                                 fill

@@ -26,6 +26,11 @@ export async function POST(request) {
 
     const formData = await request.formData();
     const file = formData.get("file");
+    const folderRaw = formData.get("folder");
+    const folder =
+      typeof folderRaw === "string" && /^[a-z0-9-]+$/.test(folderRaw)
+        ? folderRaw
+        : "products";
 
     if (!file || typeof file === "string") {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -40,7 +45,7 @@ export async function POST(request) {
     }
 
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const serviceClient = await createServiceClient();
