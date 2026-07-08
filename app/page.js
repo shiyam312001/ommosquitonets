@@ -11,7 +11,9 @@ import {
   Star,
   Leaf,
   Mail,
+  MessageCircle,
   Share2,
+  Video,
   HeartPulse,
   IndianRupee,
 } from "lucide-react";
@@ -19,7 +21,7 @@ import { Button, Card } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
 import NetSystemsSection from "@/components/home/NetSystemsSection";
 import { FEATURED_SLUGS } from "@/lib/constants";
-import InstagramGallery from "@/components/home/InstagramGallery";
+import VideoCard from "@/components/home/VideoCard";
 import { getCategories, categoryToSystem } from "@/lib/categories";
 import { getInstagramVideos } from "@/lib/instagram";
 import { NET_BENEFITS } from "@/lib/categories-content";
@@ -140,7 +142,7 @@ export default async function HomePage() {
       <NetSystemsSection systems={productSystems} />
 
       {/* Instagram Video Gallery */}
-      <InstagramGallery videos={instagramVideos} />
+      <VideoCard videos={instagramVideos} />
 
       {/* Categories */}
       <section className="py-16 md:py-20 bg-white">
@@ -263,55 +265,77 @@ export default async function HomePage() {
       <section className="py-12 bg-sky-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
-            <div className="min-w-0 md:max-w-[45%]">
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-4">
-                Visit Us in Thiruverkadu, Chennai
-              </h2>
-              <p className="text-slate-400 text-sm mb-4">
-                Walk into our store or call for a free home visit anywhere in Chennai.
-              </p>
+            {/* Store info */}
+            <div className="min-w-0 md:max-w-[50%]">
+            
               <div className="space-y-3 text-slate-300">
                 <p className="flex items-start gap-2">
-                  <MapPin className="h-5 w-5 shrink-0 text-sky-400 mt-0.5" />
+                  <MapPin className="h-5 w-5 shrink-0 text-sky-400 mt-0.5" aria-hidden="true" />
                   {BUSINESS.address}
                 </p>
-                <a href={`tel:${BUSINESS.phoneRaw}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
-                  <Phone className="h-5 w-5 text-sky-400" />
+                <a
+                  href={`tel:${BUSINESS.phoneRaw}`}
+                  className="flex items-center gap-2 hover:text-sky-400 transition-colors w-fit"
+                >
+                  <Phone className="h-5 w-5 text-sky-400" aria-hidden="true" />
                   {BUSINESS.phone}
                 </a>
               </div>
             </div>
-            <div className="min-w-0 md:max-w-[45%]">
-              <h3 className="font-display font-semibold text-white mb-4">Contact Us</h3>
-              <ul className="space-y-3 text-sm text-slate-300">
-                <li className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-sky-400" aria-hidden="true" />
-                  <span>{BUSINESS.address}</span>
-                </li>
-                <li>
-                  <a href={`tel:${BUSINESS.phoneRaw}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
-                    <Phone className="h-4 w-4 text-sky-400" aria-hidden="true" />
-                    {BUSINESS.phone}
+
+            {/* Connect / social icons */}
+            <div className="min-w-0">
+              <h3 className="font-display font-semibold text-white mb-4">Connect With Us</h3>
+              <div className="flex items-center gap-3">
+                <a
+                  href={`tel:${BUSINESS.phoneRaw}`}
+                  aria-label="Call us"
+                  title="Call"
+                  className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-sky-500 hover:ring-sky-400 transition-all"
+                >
+                  <Phone className="h-5 w-5 text-sky-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                </a>
+
+                {BUSINESS.whatsapp && (
+                  <a
+                    href={BUSINESS.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Message us on WhatsApp"
+                    title="WhatsApp"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-emerald-500 hover:ring-emerald-400 transition-all"
+                  >
+                    <MessageCircle className="h-5 w-5 text-emerald-400 group-hover:text-white transition-colors" aria-hidden="true" />
                   </a>
-                </li>
-                <li>
-                  <a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
-                    <Mail className="h-4 w-4 text-sky-400" aria-hidden="true" />
-                    {BUSINESS.email}
-                  </a>
-                </li>
-                <li>
+                )}
+
+                {BUSINESS.instagram && (
                   <a
                     href={BUSINESS.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 hover:text-sky-400 transition-colors"
+                    aria-label="Follow us on Instagram"
+                    title="Instagram"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-pink-500 hover:ring-pink-400 transition-all"
                   >
-                    <Share2 className="h-4 w-4 text-sky-400" aria-hidden="true" />
-                    @ommosquitonets
+                    <Share2 className="h-5 w-5 text-pink-400 group-hover:text-white transition-colors" aria-hidden="true" />
                   </a>
-                </li>
-              </ul>
+                )}
+
+                {BUSINESS.youtube && (
+                  <a
+                    href={BUSINESS.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Subscribe on YouTube"
+                    title="YouTube"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-red-500 hover:ring-red-400 transition-all"
+                  >
+                    <Video className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
+              <p className="mt-4 text-sm text-slate-400">{BUSINESS.email}</p>
             </div>
           </div>
         </div>
