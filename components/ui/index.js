@@ -7,3 +7,4 @@ export { default as Modal } from "./Modal";
 export { default as Skeleton, ProductCardSkeleton, ProductGridSkeleton } from "./Skeleton";
 export { default as RemoteImage } from "./RemoteImage";
 export { ToastProvider, useToast } from "./Toast";
+export { default as RichTextEditor } from "./RichTextEditor";

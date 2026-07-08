@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import RemoteImage from "@/components/ui/RemoteImage";
 import { Plus, Pencil, Trash2, ChevronRight, FolderTree, Upload, X } from "lucide-react";
-import { Button, Input, Textarea, Card, Modal, Badge } from "@/components/ui";
+import { Button, Input, Card, Modal, Badge, RichTextEditor } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
@@ -271,7 +271,7 @@ export default function AdminCategoriesPage() {
         <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
           <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <Input label="Tagline" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Short highlight text" />
-          <Textarea label="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          <RichTextEditor label="Description" value={form.description} onChange={(html) => setForm({ ...form, description: html })} />
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Category Image</label>

@@ -10,12 +10,15 @@ import {
   ArrowRight,
   Star,
   Leaf,
+  Mail,
+  Share2,
   HeartPulse,
   IndianRupee,
 } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
-import NetSystemsSection, { FEATURED_SLUGS } from "@/components/home/NetSystemsSection";
+import NetSystemsSection from "@/components/home/NetSystemsSection";
+import { FEATURED_SLUGS } from "@/lib/constants";
 import InstagramGallery from "@/components/home/InstagramGallery";
 import { getCategories, categoryToSystem } from "@/lib/categories";
 import { getInstagramVideos } from "@/lib/instagram";
@@ -95,9 +98,6 @@ export default async function HomePage() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="inline-block px-4 py-1.5 rounded-full bg-sky-100 text-sky-700 text-sm font-medium mb-6">
-                Thiruverkadu, Chennai — Custom Mosquito Net Specialists
-              </span>
               <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight mb-6">
                 Chennai&apos;s Smart Way to{" "}
                 <span className="text-sky-500">Keep Insects Out</span>
@@ -106,9 +106,6 @@ export default async function HomePage() {
                 Pleated, roller, magnetic & openable mosquito nets for doors, windows,
                 balconies & beds. Measured, made & installed by our team — chemical-free
                 protection for your family.
-              </p>
-              <p className="text-sm text-sky-600 font-medium mb-8">
-                Free site visit & quote · All Chennai localities
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/categories">
@@ -265,8 +262,8 @@ export default async function HomePage() {
       {/* Contact Strip */}
       <section className="py-12 bg-sky-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
+            <div className="min-w-0 md:max-w-[45%]">
               <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-4">
                 Visit Us in Thiruverkadu, Chennai
               </h2>
@@ -284,14 +281,37 @@ export default async function HomePage() {
                 </a>
               </div>
             </div>
-            <div className="rounded-xl overflow-hidden h-48 md:h-56 bg-slate-800 ring-1 ring-white/10">
-              <iframe
-                title="Om Mosquito Nets Location"
-                src="https://maps.google.com/maps?q=Kamadhenu+Nagar+Thiruverkadu+Chennai&output=embed"
-                className="w-full h-full border-0"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+            <div className="min-w-0 md:max-w-[45%]">
+              <h3 className="font-display font-semibold text-white mb-4">Contact Us</h3>
+              <ul className="space-y-3 text-sm text-slate-300">
+                <li className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-sky-400" aria-hidden="true" />
+                  <span>{BUSINESS.address}</span>
+                </li>
+                <li>
+                  <a href={`tel:${BUSINESS.phoneRaw}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
+                    <Phone className="h-4 w-4 text-sky-400" aria-hidden="true" />
+                    {BUSINESS.phone}
+                  </a>
+                </li>
+                <li>
+                  <a href={`mailto:${BUSINESS.email}`} className="flex items-center gap-2 hover:text-sky-400 transition-colors">
+                    <Mail className="h-4 w-4 text-sky-400" aria-hidden="true" />
+                    {BUSINESS.email}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={BUSINESS.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-sky-400 transition-colors"
+                  >
+                    <Share2 className="h-4 w-4 text-sky-400" aria-hidden="true" />
+                    @ommosquitonets
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -299,3 +319,4 @@ export default async function HomePage() {
     </>
   );
 }
+         

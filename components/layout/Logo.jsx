@@ -6,7 +6,7 @@ const sizes = {
   sm: { height: 32, width: 120 },
   md: { height: 40, width: 150 },
   lg: { height: 48, width: 180 },
-  header: { height: 170, width: 200 },
+  header: { height: 220, width: 260 },
   xl: { height: 64, width: 240 },
 };
 
