@@ -110,12 +110,55 @@ export default async function HomePage() {
                 protection for your family.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/categories">
-                  <Button size="lg" className="w-full sm:w-auto shadow-lg shadow-sky-500/20">
-                    Browse Categories
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
+                 <div className="flex items-center gap-3">
+                <a
+                  href={`tel:${BUSINESS.phoneRaw}`}
+                  aria-label="Call us"
+                  title="Call"
+                  className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-sky-500 hover:ring-sky-400 transition-all"
+                >
+                  <Phone className="h-5 w-5 text-sky-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                </a>
+
+                {BUSINESS.whatsapp && (
+                  <a
+                    href={BUSINESS.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Message us on WhatsApp"
+                    title="WhatsApp"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-emerald-500 hover:ring-emerald-400 transition-all"
+                  >
+                    <MessageCircle className="h-5 w-5 text-emerald-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                  </a>
+                )}
+
+                {BUSINESS.instagram && (
+                  <a
+                    href={BUSINESS.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow us on Instagram"
+                    title="Instagram"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-pink-500 hover:ring-pink-400 transition-all"
+                  >
+                    <Share2 className="h-5 w-5 text-pink-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                  </a>
+                )}
+
+                {BUSINESS.youtube && (
+                  <a
+                    href={BUSINESS.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Subscribe on YouTube"
+                    title="YouTube"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-red-500 hover:ring-red-400 transition-all"
+                  >
+                    <Video className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
                 <a href={`tel:${BUSINESS.phoneRaw}`}>
                   <Button variant="outline" size="lg" className="w-full sm:w-auto">
                     <Phone className="h-4 w-4" />
@@ -138,11 +181,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <NetSystemsSection systems={productSystems} />
-
-      {/* Instagram Video Gallery */}
-      <VideoCard videos={instagramVideos} />
 
       {/* Categories */}
       <section className="py-16 md:py-20 bg-white">
