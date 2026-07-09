@@ -105,21 +105,12 @@ export default async function HomePage() {
                 <span className="text-sky-500">Keep Insects Out</span>
               </h1>
               <p className="text-lg text-slate-600 leading-relaxed mb-4 max-w-lg">
-                Pleated, roller, magnetic & openable mosquito nets for doors, windows,
-                balconies & beds. Measured, made & installed by our team — chemical-free
-                protection for your family.
+                <span className="block mb-2">Protect Your Home Without Compromising Fresh Air</span>
+                Experience premium mosquito net solutions designed to keep insects out while allowing fresh air and natural light to flow freely. We provide durable, elegant, and customized mosquito net installations for windows, doors, balconies, and ventilators that blend perfectly with your home.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                  <div className="flex items-center gap-3">
-                <a
-                  href={`tel:${BUSINESS.phoneRaw}`}
-                  aria-label="Call us"
-                  title="Call"
-                  className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-sky-500 hover:ring-sky-400 transition-all"
-                >
-                  <Phone className="h-5 w-5 text-sky-400 group-hover:text-white transition-colors" aria-hidden="true" />
-                </a>
-
+          
                 {BUSINESS.whatsapp && (
                   <a
                     href={BUSINESS.whatsapp}
@@ -300,39 +291,51 @@ export default async function HomePage() {
       </section>
 
       {/* Contact Strip */}
-      <section className="py-12 bg-sky-950">
+      <section className="py-12 bg-sky-950 text-slate-300">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
-            {/* Store info */}
-            <div className="min-w-0 md:max-w-[50%]">
-            
-              <div className="space-y-3 text-slate-300">
-                <p className="flex items-start gap-2">
-                  <MapPin className="h-5 w-5 shrink-0 text-sky-400 mt-0.5" aria-hidden="true" />
-                  {BUSINESS.address}
-                </p>
-                <a
-                  href={`tel:${BUSINESS.phoneRaw}`}
-                  className="flex items-center gap-2 hover:text-sky-400 transition-colors w-fit"
-                >
-                  <Phone className="h-5 w-5 text-sky-400" aria-hidden="true" />
-                  {BUSINESS.phone}
-                </a>
+          <div className="grid gap-10 md:grid-cols-4">
+            <div className="space-y-4">
+              <div className="flex h-full w-full items-center justify-center">
+                <Link href="/" className="block w-full">
+                  <Image
+                    src="/footer.png"
+                    alt="Om Mosquito Nets"
+                    width={250}
+                    height={100}
+                    className="h-auto w-full object-contain"
+                    priority
+                  />
+                </Link>
               </div>
             </div>
 
-            {/* Connect / social icons */}
-            <div className="min-w-0">
-              <h3 className="font-display font-semibold text-white mb-4">Connect With Us</h3>
-              <div className="flex items-center gap-3">
-                <a
-                  href={`tel:${BUSINESS.phoneRaw}`}
-                  aria-label="Call us"
-                  title="Call"
-                  className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-sky-500 hover:ring-sky-400 transition-all"
-                >
-                  <Phone className="h-5 w-5 text-sky-400 group-hover:text-white transition-colors" aria-hidden="true" />
-                </a>
+            <div>
+              <h3 className="font-display text-white text-lg font-semibold mb-4">Quick Links</h3>
+              <div className="grid gap-3 text-sm">
+                <Link href="/" className="block hover:text-white transition-colors">Home</Link>
+                <Link href="/categories" className="block hover:text-white transition-colors">Categories</Link>
+                <Link href="/products" className="block hover:text-white transition-colors">Products</Link>
+                <Link href="/about" className="block hover:text-white transition-colors">About Us</Link>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-display text-white text-lg font-semibold mb-4">Address</h3>
+              <div className="space-y-3 text-sm text-slate-400">
+                <p className="flex items-start gap-2">
+                  <MapPin className="mt-0.5 h-5 w-5 text-sky-400" aria-hidden="true" />
+                  {BUSINESS.address}
+                </p>
+                <p className="flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-sky-400" aria-hidden="true" />
+                  <a href={`tel:${BUSINESS.phoneRaw}`} className="hover:text-white transition-colors">{BUSINESS.phone}</a>
+                </p>
+                <p>{BUSINESS.email}</p>
+              </div>
+            </div>
+
+             <div className="flex flex-col sm:flex-row gap-4">
+                 <div className="flex items-center gap-3">
 
                 {BUSINESS.whatsapp && (
                   <a
@@ -372,9 +375,15 @@ export default async function HomePage() {
                     <Video className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" aria-hidden="true" />
                   </a>
                 )}
+                <a
+                  href={`tel:${BUSINESS.phoneRaw}`}
+                  aria-label="Call us"
+                  className="group inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 transition-colors"
+                >
+                  <Phone className="h-5 w-5" aria-hidden="true" />
+                </a>
               </div>
-              <p className="mt-4 text-sm text-slate-400">{BUSINESS.email}</p>
-            </div>
+              </div>
           </div>
         </div>
       </section>
