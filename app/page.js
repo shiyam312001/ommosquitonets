@@ -20,6 +20,7 @@ import {
 import { Button, Card } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
 import NetSystemsSection from "@/components/home/NetSystemsSection";
+import TestimonialsCarousel from "@/components/home/TestimonialsCarousel";
 import { FEATURED_SLUGS } from "@/lib/constants";
 import VideoCard from "@/components/home/VideoCard";
 import { getCategories, categoryToSystem } from "@/lib/categories";
@@ -276,21 +277,8 @@ export default async function HomePage() {
               What Chennai Customers Say
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <Card key={t.name} className="border-0 shadow-md">
-                <div className="flex gap-1 mb-3">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-slate-600 text-sm leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
-                <div>
-                  <p className="font-medium text-slate-900 text-sm">{t.name}</p>
-                  <p className="text-xs text-slate-400">{t.location}</p>
-                </div>
-              </Card>
-            ))}
+          <div className="mx-auto max-w-6xl">
+            <TestimonialsCarousel testimonials={testimonials} />
           </div>
         </div>
       </section>
