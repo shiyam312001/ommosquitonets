@@ -14,11 +14,14 @@ const emptyForm = {
   description: "",
   tagline: "",
   image_url: "",
+  media: [],
   parent_id: "",
   features: "",
   specifications: "",
   sort_order: "0",
 };
+
+const MAX_UPLOAD = 25 * 1024 * 1024; // 25MB client limit
 
 function parseSpecs(text) {
   if (!text?.trim()) return null;
@@ -44,16 +47,18 @@ export default function AdminCategoriesPage() {
   const { addToast } = useToast();
   const supabase = createClient();
 
-  const load = async () => {
-    const { data } = await supabase
-      .from("categories")
-      .select("*")
-      .order("sort_order")
-      .order("name");
-    setCategories(data || []);
-  };
+  useEffect(() => {
+    async function loadCategories() {
+      const { data } = await supabase
+        .from("categories")
+        .select("*")
+        .order("sort_order")
+        .order("name");
+      setCategories(data || []);
+    }
 
-  useEffect(() => { load(); }, []);
+    loadCategories();
+  }, [supabase]);
 
   const tree = useMemo(() => {
     const roots = categories.filter((c) => !c.parent_id);
@@ -65,7 +70,7 @@ export default function AdminCategoriesPage() {
 
   const openCreate = (parentId = "") => {
     setEditing(null);
-    setForm({ ...emptyForm, parent_id: parentId });
+    setForm({ ...emptyForm, parent_id: parentId, media: [] });
     setSpecError("");
     setModalOpen(true);
   };
@@ -77,6 +82,7 @@ export default function AdminCategoriesPage() {
       description: cat.description || "",
       tagline: cat.tagline || "",
       image_url: cat.image_url || "",
+      media: cat.media || [],
       parent_id: cat.parent_id || "",
       features: cat.features?.join(", ") || "",
       specifications: formatSpecs(cat.specifications),
@@ -87,25 +93,40 @@ export default function AdminCategoriesPage() {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
     setUploading(true);
+    const uploaded = [];
     try {
-      const body = new FormData();
-      body.append("file", file);
-      body.append("folder", "categories");
+      for (const file of files) {
+        if (file.size > MAX_UPLOAD) {
+          addToast(`${file.name} is too large. Max ${Math.round(MAX_UPLOAD / (1024 * 1024))}MB.`, "error");
+          continue;
+        }
+        const body = new FormData();
+        body.append("file", file);
+        body.append("folder", "categories");
 
-      const res = await fetch("/api/upload", { method: "POST", body });
-      const data = await res.json();
+        const res = await fetch("/api/upload", { method: "POST", body });
+        const data = await res.json();
 
-      if (!res.ok) {
-        addToast(data.error || "Upload failed", "error");
-        return;
+        if (!res.ok) {
+          addToast(data.error || `Upload failed for ${file.name}`, "error");
+          continue;
+        }
+
+        uploaded.push(data.url);
       }
 
-      setForm((prev) => ({ ...prev, image_url: data.url }));
-      addToast("Image uploaded");
+      if (uploaded.length) {
+        setForm((prev) => ({
+          ...prev,
+          media: [...(prev.media || []), ...uploaded],
+          image_url: prev.image_url || uploaded[0],
+        }));
+        addToast("Upload complete");
+      }
     } catch (err) {
       addToast(err.message || "Upload failed", "error");
     } finally {
@@ -114,9 +135,19 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleRemoveImage = () => {
-    setForm((prev) => ({ ...prev, image_url: "" }));
+  const handleRemoveImage = (index = -1) => {
+    if (index === -1) {
+      setForm((prev) => ({ ...prev, media: [], image_url: "" }));
+      return;
+    }
+
+    setForm((prev) => {
+      const media = [...(prev.media || [])];
+      media.splice(index, 1);
+      return { ...prev, media, image_url: media[0] || "" };
+    });
   };
+
 
   const handleSave = async () => {
     const specs = parseSpecs(form.specifications);
@@ -136,6 +167,7 @@ export default function AdminCategoriesPage() {
       description: form.description || null,
       tagline: form.tagline || null,
       image_url: form.image_url || null,
+      media: form.media?.length ? form.media : null,
       parent_id: form.parent_id || null,
       features: features?.length ? features : null,
       specifications: specs,
@@ -165,7 +197,7 @@ export default function AdminCategoriesPage() {
   };
 
   const parentOptions = categories.filter((c) => c.id !== editing?.id);
-  const previewImage = form.image_url || (editing ? getCategoryImage(editing.slug) : null);
+  const previewImage = form.media?.[0] || form.image_url || (editing ? getCategoryImage(editing.slug) : null);
 
   return (
     <div>
@@ -274,26 +306,45 @@ export default function AdminCategoriesPage() {
           <RichTextEditor label="Description" value={form.description} onChange={(html) => setForm({ ...form, description: html })} />
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Category Image</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Category Media</label>
             <div className="rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
               {previewImage ? (
                 <div className="relative aspect-[16/10] w-full">
-                  <RemoteImage
-                    src={previewImage}
-                    alt="Category preview"
-                    fill
-                    className="object-cover"
-                    sizes="400px"
-                  />
-                  {form.image_url && (
+                  {/\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(previewImage) ? (
+                    <video src={previewImage} className="object-cover w-full h-full" autoPlay muted loop playsInline controls />
+                  ) : (
+                    <RemoteImage
+                      src={previewImage}
+                      alt="Category preview"
+                      fill
+                      className="object-cover"
+                      sizes="400px"
+                    />
+                  )}
+                  { (form.media?.length || form.image_url) && (
                     <button
                       type="button"
-                      onClick={handleRemoveImage}
+                      onClick={() => handleRemoveImage()}
                       className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/70 text-white hover:bg-red-600 transition-colors"
-                      title="Remove image"
+                      title="Remove media"
                     >
                       <X className="h-4 w-4" />
                     </button>
+                  )}
+
+                  {form.media?.length > 1 && (
+                    <div className="absolute left-4 bottom-4 flex gap-2">
+                      {form.media.map((m, i) => (
+                        <div key={m} className="relative w-12 h-8 rounded overflow-hidden bg-slate-100">
+                          {/\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(m) ? (
+                            <video src={m} className="object-cover w-full h-full" muted playsInline />
+                          ) : (
+                            <img src={m} alt={`thumb-${i}`} className="object-cover w-full h-full" />
+                          )}
+                          <button onClick={() => handleRemoveImage(i)} className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 text-xs shadow">×</button>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               ) : (
@@ -301,10 +352,10 @@ export default function AdminCategoriesPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-200 text-slate-500 mb-3">
                     <Upload className="h-5 w-5" />
                   </div>
-                  <p className="text-sm text-slate-500 mb-3">JPG, PNG or WebP — max 5MB</p>
+                  <p className="text-sm text-slate-500 mb-3">JPG, PNG, WebP, MP4 or WebM — max 5MB</p>
                 </div>
               )}
-              <div className="flex items-center gap-3 border-t border-slate-200 bg-white p-3">
+              <div className="space-y-3 border-t border-slate-200 bg-white p-3">
                 <label className="inline-flex flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 cursor-pointer hover:bg-slate-50 transition-colors">
                   {uploading ? (
                     <>
@@ -314,17 +365,30 @@ export default function AdminCategoriesPage() {
                   ) : (
                     <>
                       <Upload className="h-4 w-4" />
-                      {form.image_url ? "Replace image" : "Upload image"}
+                      {form.image_url ? "Replace media" : "Upload media"}
                     </>
                   )}
                   <input
                     type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,video/ogg"
                     onChange={handleImageUpload}
                     disabled={uploading}
+                    multiple
                     className="sr-only"
                   />
                 </label>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Upload files directly</label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,video/ogg"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    multiple
+                    className="block w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 file:cursor-pointer file:border-none file:bg-slate-900 file:px-3 file:py-1 file:text-white"
+                  />
+                  <p className="mt-2 text-xs text-slate-500">Upload local JPG, PNG, WebP, GIF, MP4, WebM, MOV, or OGG files. 25MB max per file.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -345,6 +409,9 @@ export default function AdminCategoriesPage() {
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-sky-500"
             />
             {specError && <p className="text-red-500 text-xs mt-1">{specError}</p>}
+          </div>
+          <div className="text-sm text-slate-500">
+            Use the upload button above for local MP4/WebM/MOV/OGG files.
           </div>
           <Input label="Sort Order" type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} />
           <div>

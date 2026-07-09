@@ -76,12 +76,7 @@ export default function YoutubeGallery({ videos }) {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-50 text-sky-600 text-sm font-medium mb-4 border border-sky-100">
-              <Video className="h-4 w-4" />
-              @ommosquitonets
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-3">
-              Installation Videos
-            </h2>
             <p className="text-slate-500 max-w-xl leading-relaxed">
               See our mosquito net installations in action. Subscribe on YouTube for
               the latest projects across Chennai.
@@ -97,7 +92,7 @@ export default function YoutubeGallery({ videos }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {videos.slice(0, 6).map((video) => (
+          {videos.slice(0, 3).map((video) => (
             <VideoCard key={video.id} video={video} />
           ))}
         </div>

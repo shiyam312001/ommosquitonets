@@ -4,15 +4,48 @@ import { MessageCircle, Phone, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui";
 import CategoryCard from "@/components/categories/CategoryCard";
 import CategorySpecifications from "@/components/categories/CategorySpecifications";
-import { normalizeCategory } from "@/lib/category-utils";
+import { normalizeCategory, parseCategoryMedia, isVideoMedia } from "@/lib/category-utils";
 import { getCategoryEnquiryLink } from "@/lib/category-specs";
+import VideoCard from "@/components/home/VideoCard";
+import { getInstagramVideos } from "@/lib/instagram";
+import MediaCarousel from "@/components/ui/MediaCarousel";
+import CategoryHeroVideo from "@/components/categories/CategoryHeroVideo";
 import { BUSINESS } from "@/lib/utils";
 
-export default function CategoryDetailView({ category: raw, parent, children }) {
+export default async function CategoryDetailView({ category: raw, parent, children }) {
   const category = normalizeCategory(raw, parent);
   const parentNorm = parent ? normalizeCategory(parent) : null;
   const hasChildren = children?.length > 0;
   const enquiryLink = getCategoryEnquiryLink(category, parentNorm);
+  const instagramVideos = await getInstagramVideos();
+  const mediaList = parseCategoryMedia(category);
+
+  const heroMedia =
+    mediaList.length > 1 ? (
+      <MediaCarousel media={mediaList} alt={category.name} />
+    ) : mediaList.length === 1 ? (
+      isVideoMedia(mediaList[0]) ? (
+        <CategoryHeroVideo src={mediaList[0]} />
+      ) : (
+        <RemoteImage
+          src={mediaList[0]}
+          alt={category.name}
+          fill
+          className="object-cover"
+          priority
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
+      )
+    ) : (
+      <RemoteImage
+        src={category.image}
+        alt={category.name}
+        fill
+        className="object-cover"
+        priority
+        sizes="(max-width: 1024px) 100vw, 50vw"
+      />
+    );
 
   return (
     <div>
@@ -75,15 +108,8 @@ export default function CategoryDetailView({ category: raw, parent, children }) 
             </div>
 
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
-              <RemoteImage
-                src={category.image}
-                alt={category.name}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+              {heroMedia}
+              <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-slate-950/40 to-transparent" />
             </div>
           </div>
         </div>
@@ -123,56 +149,8 @@ export default function CategoryDetailView({ category: raw, parent, children }) 
       )}
 
       {/* WhatsApp CTA strip */}
-   <section className="py-16 md:py-20 bg-slate-50">
-  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div className="relative overflow-hidden rounded-3xl bg-white px-6 py-14 sm:px-12 sm:py-16 text-center shadow-xl shadow-slate-900/5 ring-1 ring-slate-900/5">
-      {/* Ambient glow, lightened for a white card */}
-      <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(14,165,233,0.08),transparent)]"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_110%)]"
-        aria-hidden="true"
-      />
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-sky-500/40 to-transparent" aria-hidden="true" />
+            <VideoCard videos={instagramVideos} />
 
-      <div className="relative">
-        <span className="inline-flex items-center rounded-full bg-sky-500/10 px-4 py-1.5 text-sm font-medium text-sky-700 ring-1 ring-sky-500/20 mb-5">
-          Free site visit across Chennai
-        </span>
-
-        <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight max-w-2xl mx-auto">
-          Get a free quote for {category.name}
-        </h2>
-        <p className="text-slate-600 text-lg mb-12 max-w-lg mx-auto leading-relaxed">
-          Send us your requirements on WhatsApp — measurements, photos, or just
-          your address. We&apos;ll get back with a quote and a visit date.
-        </p>
-
-        {/* Trust stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4 max-w-3xl mx-auto">
-          {[
-            { value: "500+", label: "Homes Protected" },
-            { value: "5+ yrs", label: "In Business" },
-            { value: "24 hrs", label: "Response Time" },
-            { value: "100%", label: "Custom Fit" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-2xl bg-slate-50 ring-1 ring-slate-900/5 py-6 px-3"
-            >
-              <p className="font-display text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
-                {stat.value}
-              </p>
-              <p className="text-xs sm:text-sm text-slate-500">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
     </div>
   );
 }
