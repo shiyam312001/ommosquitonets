@@ -11,9 +11,6 @@ import {
   Star,
   Leaf,
   Mail,
-  MessageCircle,
-  Share2,
-  Video,
   HeartPulse,
   IndianRupee,
 } from "lucide-react";
@@ -60,24 +57,29 @@ const testimonials = [
     location: "Anna Nagar, Chennai",
     rating: 5,
     text: "I recently Installed a mosquito net from a vendor named Muthu. He did excellent work, and the quality is also very good. My mom was very happy with the work. I highly recommend him to my friends and circle as well.",
+    highlights: ["excellent work", "quality", "highly recommend"],
   },
   {
     name: "Kalyani PD",
     location: "Velachery, Chennai",
     rating: 5,
     text: "l am very much satisfied with the service, quality and cost provided by om mosquito nets.we put mosquito nets in our house 2 years back, my front door became loosen due to usage of many no. of times, immediately I called Muthu (Om nets)he came and modified very well and gave free service which was very much satisfied.",
+    highlights: ["satisfied", "quality", "free service"],
   },
   {
     name: "Sharmila Queenthy",
     location: "Thiruverkadu",
     rating: 5,
     text: "Excellent Service ! The team was polite and installed mosquito nets for all windows and doors in 3 hours. Neat work, no mess, and very reasonable price. Quality of mesh and frame is strong. Highly recommend!",
-  },{
+    highlights: ["Excellent Service", "reasonable price", "Highly recommend"],
+  },
+  {
     name: "Kalayarasi Arvind",
     location: "Avadi, Chennai",
     rating: 5,
     text: "I am very happy with the mosquito net fitting service. The team was professional, arrived on time, and completed the Installation neatly. The quality of the mosquito net is excellent, and the fitting is perfect. It keeps mosquitoes out while allowing fresh air to come in. The staff were polite, and the overall service was worth the price. Highly recommended to anyone looking for quality mosquito net installation!",
-  }
+    highlights: ["professional", "excellent", "perfect", "Highly recommended"],
+  },
 ];
 
 export default async function HomePage() {
@@ -85,7 +87,24 @@ export default async function HomePage() {
     getCategories(),
     getInstagramVideos(),
   ]);
+function highlightText(text, keywords) {
+  if (!keywords?.length) return text;
+  const pattern = new RegExp(`(${keywords.join("|")})`, "gi");
+  return text.split(pattern).map((part, i) =>
+    keywords.some((k) => k.toLowerCase() === part.toLowerCase()) ? (
+      <span key={i} className="font-semibold text-sky-600">
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  );
+}
 
+const highlightedTestimonials = testimonials.map((t) => ({
+  ...t,
+  text: highlightText(t.text, t.highlights),
+}));
   const rootCategories = categories
     .filter((c) => !c.parent_id)
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
@@ -114,48 +133,88 @@ export default async function HomePage() {
                 <span className="block mb-2">Protect Your Home Without Compromising Fresh Air</span>
                 Experience premium mosquito net solutions designed to keep insects out while allowing fresh air and natural light to flow freely. We provide durable, elegant, and customized mosquito net installations for windows, doors, balconies, and ventilators that blend perfectly with your home.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                 <div className="flex items-center gap-3">
-          
-                {BUSINESS.whatsapp && (
-                  <a
-                    href={BUSINESS.whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Message us on WhatsApp"
-                    title="WhatsApp"
-                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-emerald-500 hover:ring-emerald-400 transition-all"
-                  >
-                    <MessageCircle className="h-5 w-5 text-emerald-400 group-hover:text-white transition-colors" aria-hidden="true" />
-                  </a>
-                )}
+              <div className="flex flex-col sm:flex-row gap-4 items-center flex-wrap">
+                <div className="flex items-center gap-3">
+                  {BUSINESS.whatsapp && (
+                    <a
+                      href={BUSINESS.whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Message us on WhatsApp"
+                      title="WhatsApp"
+                      className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 transition-all hover:ring-white/30"
+                    >
+                      <span className="absolute inset-0 rounded-full bg-green-400/40 animate-ping [animation-duration:2s]" />
+                      <Image
+                        src="/whatsapp.jpg"
+                        alt="WhatsApp"
+                        width={48}
+                        height={48}
+                        className="relative h-11 w-11 rounded-full object-cover"
+                      />
+                    </a>
+                  )}
 
-                {BUSINESS.instagram && (
-                  <a
-                    href={BUSINESS.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Follow us on Instagram"
-                    title="Instagram"
-                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-pink-500 hover:ring-pink-400 transition-all"
-                  >
-                    <Share2 className="h-5 w-5 text-pink-400 group-hover:text-white transition-colors" aria-hidden="true" />
-                  </a>
-                )}
+                  {BUSINESS.instagram && (
+                    <a
+                      href={BUSINESS.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Follow us on Instagram"
+                      title="Instagram"
+                      className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 transition-all hover:ring-white/30"
+                    >
+                      <span className="absolute inset-0 rounded-full bg-pink-400/40 animate-ping [animation-duration:2s]" />
+                      <Image
+                        src="/instagram.jpg"
+                        alt="Instagram"
+                        width={48}
+                        height={48}
+                        className="relative h-11 w-11 rounded-full object-cover"
+                      />
+                    </a>
+                  )}
 
-                {BUSINESS.youtube && (
-                  <a
-                    href={BUSINESS.youtube}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Subscribe on YouTube"
-                    title="YouTube"
-                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-red-500 hover:ring-red-400 transition-all"
-                  >
-                    <Video className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" aria-hidden="true" />
-                  </a>
-                )}
-              </div>
+                  {BUSINESS.facebook && (
+                    <a
+                      href={BUSINESS.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Follow us on Facebook"
+                      title="Facebook"
+                      className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 transition-all hover:ring-white/30"
+                    >
+                      <span className="absolute inset-0 rounded-full bg-blue-400/40 animate-ping [animation-duration:2s]" />
+                      <Image
+                        src="/fb.avif"
+                        alt="Facebook"
+                        width={48}
+                        height={48}
+                        className="relative h-11 w-11 rounded-full object-cover"
+                      />
+                    </a>
+                  )}
+
+                  {BUSINESS.youtube && (
+                    <a
+                      href={BUSINESS.youtube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Subscribe on YouTube"
+                      title="YouTube"
+                      className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 transition-all hover:ring-white/30"
+                    >
+                      <span className="absolute inset-0 rounded-full bg-red-400/40 animate-ping [animation-duration:2s]" />
+                      <Image
+                        src="/youtube.png"
+                        alt="YouTube"
+                        width={48}
+                        height={48}
+                        className="relative h-11 w-11 rounded-full object-cover"
+                      />
+                    </a>
+                  )}
+                </div>
                 <a href={`tel:${BUSINESS.phoneRaw}`}>
                   <Button variant="outline" size="lg" className="w-full sm:w-auto">
                     <Phone className="h-4 w-4" />
@@ -278,8 +337,7 @@ export default async function HomePage() {
             </h2>
           </div>
           <div className="mx-auto max-w-6xl">
-            <TestimonialsCarousel testimonials={testimonials} />
-          </div>
+<TestimonialsCarousel testimonials={highlightedTestimonials} />          </div>
         </div>
       </section>
 
@@ -339,7 +397,13 @@ export default async function HomePage() {
                     title="WhatsApp"
                     className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-emerald-500 hover:ring-emerald-400 transition-all"
                   >
-                    <MessageCircle className="h-5 w-5 text-emerald-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                    <Image
+                      src="/whatsapp.jpg"
+                      alt="WhatsApp"
+                      width={24}
+                      height={24}
+                      className="h-5 w-5 rounded-full object-cover"
+                    />
                   </a>
                 )}
 
@@ -352,7 +416,32 @@ export default async function HomePage() {
                     title="Instagram"
                     className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-pink-500 hover:ring-pink-400 transition-all"
                   >
-                    <Share2 className="h-5 w-5 text-pink-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                    <Image
+                      src="/instagram.jpg"
+                      alt="Instagram"
+                      width={24}
+                      height={24}
+                      className="h-5 w-5 rounded-full object-cover"
+                    />
+                  </a>
+                )}
+
+                {BUSINESS.facebook && (
+                  <a
+                    href={BUSINESS.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow us on Facebook"
+                    title="Facebook"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-blue-600 hover:ring-blue-500 transition-all"
+                  >
+                    <Image
+                      src="/fb.avif"
+                      alt="Facebook"
+                      width={24}
+                      height={24}
+                      className="h-5 w-5 rounded-full object-cover"
+                    />
                   </a>
                 )}
 
@@ -365,16 +454,17 @@ export default async function HomePage() {
                     title="YouTube"
                     className="group flex h-12 w-12 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 hover:bg-red-500 hover:ring-red-400 transition-all"
                   >
-                    <Video className="h-5 w-5 text-red-400 group-hover:text-white transition-colors" aria-hidden="true" />
+                    <Image
+                      src="/youtube.png"
+                      alt="YouTube"
+                      width={24}
+                      height={24}
+                      className="h-auto w-[70px] rounded-full object-contain"
+                    />
                   </a>
                 )}
-                <a
-                  href={`tel:${BUSINESS.phoneRaw}`}
-                  aria-label="Call us"
-                  className="group inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 transition-colors"
-                >
-                  <Phone className="h-5 w-5" aria-hidden="true" />
-                </a>
+                
+
               </div>
               </div>
           </div>
