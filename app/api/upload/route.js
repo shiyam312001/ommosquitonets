@@ -85,18 +85,26 @@ export async function POST(request) {
     const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext || "jpg"}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const serviceClient = await createServiceClient();
+    const uploadOptions = { contentType, upsert: false };
 
-    if (!serviceClient) {
-      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
-    }
-
-    const { error: uploadError } = await serviceClient.storage
+    // Prefer the signed-in admin session so storage RLS sees auth.uid().
+    // Service role is only a fallback (e.g. when policies allow service_role only).
+    let uploadClient = supabase;
+    let { error: uploadError } = await uploadClient.storage
       .from(BUCKET)
-      .upload(path, buffer, {
-        contentType,
-        upsert: false,
-      });
+      .upload(path, buffer, uploadOptions);
+
+    if (uploadError) {
+      const serviceClient = await createServiceClient();
+      if (serviceClient) {
+        ({ error: uploadError } = await serviceClient.storage
+          .from(BUCKET)
+          .upload(path, buffer, uploadOptions));
+        if (!uploadError) {
+          uploadClient = serviceClient;
+        }
+      }
+    }
 
     if (uploadError) {
       let message = uploadError.message;
@@ -106,11 +114,14 @@ export async function POST(request) {
       } else if (/mime type .* is not supported/i.test(uploadError.message)) {
         message =
           "Storage bucket does not allow this file type yet. Run supabase/migrations/011_storage_video_support.sql in Supabase SQL Editor.";
+      } else if (/row-level security/i.test(uploadError.message)) {
+        message =
+          "Storage upload blocked by RLS. Run supabase/migrations/012_fix_storage_rls.sql in Supabase SQL Editor and confirm your user has role = 'admin' in profiles.";
       }
       return NextResponse.json({ error: message }, { status: 500 });
     }
 
-    const { data: { publicUrl } } = serviceClient.storage
+    const { data: { publicUrl } } = uploadClient.storage
       .from(BUCKET)
       .getPublicUrl(path);
 

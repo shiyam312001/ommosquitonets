@@ -47,16 +47,16 @@ export default function AdminCategoriesPage() {
   const { addToast } = useToast();
   const supabase = createClient();
 
-  useEffect(() => {
-    async function loadCategories() {
-      const { data } = await supabase
-        .from("categories")
-        .select("*")
-        .order("sort_order")
-        .order("name");
-      setCategories(data || []);
-    }
+  const loadCategories = async () => {
+    const { data } = await supabase
+      .from("categories")
+      .select("*")
+      .order("sort_order")
+      .order("name");
+    setCategories(data || []);
+  };
 
+  useEffect(() => {
     loadCategories();
   }, [supabase]);
 
@@ -185,7 +185,7 @@ export default function AdminCategoriesPage() {
     }
 
     setModalOpen(false);
-    load();
+    loadCategories();
   };
 
   const handleDelete = async (id) => {
@@ -193,7 +193,7 @@ export default function AdminCategoriesPage() {
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) { addToast(error.message, "error"); return; }
     addToast("Category deleted", "info");
-    load();
+    loadCategories();
   };
 
   const parentOptions = categories.filter((c) => c.id !== editing?.id);
