@@ -77,9 +77,16 @@ export default async function CategoryDetailView({ category: raw, parent, childr
                 <p className="text-sky-300 text-lg font-medium mb-4">{category.tagline}</p>
               )}
               {category.description && (
-                <p className="text-slate-300 leading-relaxed mb-6 max-w-xl">
-                  {category.description}
-                </p>
+                <div
+                  className="text-slate-300 leading-relaxed mb-6 max-w-xl prose prose-invert prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{
+                    __html: category.description
+                      .replace(/&lt;/g, "<")
+                      .replace(/&gt;/g, ">")
+                      .replace(/&quot;/g, '"')
+                      .replace(/&#39;/g, "'"),
+                  }}
+                />
               )}
               {category.features?.length > 0 && (
                 <ul className="grid sm:grid-cols-2 gap-2 mb-8">
