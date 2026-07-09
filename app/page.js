@@ -55,23 +55,28 @@ const benefitIcons = [Leaf, HeartPulse, Ruler, Shield, IndianRupee, Award];
 
 const testimonials = [
   {
-    name: "Priya R.",
+    name: "Surender Babu",
     location: "Anna Nagar, Chennai",
     rating: 5,
-    text: "Got pleated nets for our balcony doors — quality is excellent and the team was very professional. No gaps at all!",
+    text: "I recently Installed a mosquito net from a vendor named Muthu. He did excellent work, and the quality is also very good. My mom was very happy with the work. I highly recommend him to my friends and circle as well.",
   },
   {
-    name: "Karthik M.",
+    name: "Kalyani PD",
     location: "Velachery, Chennai",
     rating: 5,
-    text: "Magnetic mesh on the kitchen door changed our life — walk through hands-free and no mosquitoes. Highly recommend Om!",
+    text: "l am very much satisfied with the service, quality and cost provided by om mosquito nets.we put mosquito nets in our house 2 years back, my front door became loosen due to usage of many no. of times, immediately I called Muthu (Om nets)he came and modified very well and gave free service which was very much satisfied.",
   },
   {
-    name: "Lakshmi S.",
+    name: "Sharmila Queenthy",
     location: "Thiruverkadu",
     rating: 5,
-    text: "They installed window rollers and door nets for our entire flat. Fair pricing, on-time delivery, great finishing.",
-  },
+    text: "Excellent Service ! The team was polite and installed mosquito nets for all windows and doors in 3 hours. Neat work, no mess, and very reasonable price. Quality of mesh and frame is strong. Highly recommend!",
+  },{
+    name: "Kalayarasi Arvind",
+    location: "Avadi, Chennai",
+    rating: 5,
+    text: "I am very happy with the mosquito net fitting service. The team was professional, arrived on time, and completed the Installation neatly. The quality of the mosquito net is excellent, and the fitting is perfect. It keeps mosquitoes out while allowing fresh air to come in. The staff were polite, and the overall service was worth the price. Highly recommended to anyone looking for quality mosquito net installation!",
+  }
 ];
 
 export default async function HomePage() {
