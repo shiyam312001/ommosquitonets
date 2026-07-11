@@ -6,7 +6,7 @@ const sizes = {
   sm: { height: 32, width: 120 },
   md: { height: 40, width: 150 },
   lg: { height: 48, width: 180 },
-  header: { height: 150, width: 260 },
+  header: { height: 150, width: 300 },
   xl: { height: 64, width: 240 },
 };
 
@@ -20,15 +20,17 @@ export default function Logo({
   const { height, width } = sizes[size] || sizes.md;
 
   const image = (
-    <Image
-      src="/logo.png"
-      alt="Om Mosquito Nets — Smart Insect Solutions"
-      width={width}
-      height={height}
-      priority={priority}
-      className={cn("h-auto w-auto object-contain", imageClassName)}
-      style={{ height, width: "auto", maxWidth: width }}
-    />
+   <Image
+  src="/logo.png"
+  alt="Om Mosquito Nets — Smart Insect Solutions"
+  width={width}
+  height={height}
+  priority={priority}
+  className={cn(
+    "h-[175px] w-auto max-w-[320px] object-contain mt-[10px] -ml-10 md:-ml-7",
+    imageClassName
+  )}
+/>
   );
 
   if (!href) {
